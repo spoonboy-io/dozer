@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-const FILE_NAME = "../../dozer.state"
+const FILE_NAME = "dozer.state"
 
 // State holds information about the last poll against the database and
 // processes which where being tracked as "executing" when the application was terminated
@@ -45,4 +45,15 @@ func (s *State) CreateAndWrite() error {
 		return err
 	}
 	return os.WriteFile(FILE_NAME, data, 0644)
+}
+
+// DeleteProcessFromState removes an element from State.ExecutingProcesses state property by value
+func (s *State) DeleteProcessFromState(id int) {
+	var tmpState []int
+	for i := range s.ExecutingProcesses {
+		if s.ExecutingProcesses[i] == id {
+			tmpState = append(s.ExecutingProcesses[:i], s.ExecutingProcesses[i+1:]...)
+		}
+	}
+	s.ExecutingProcesses = tmpState
 }

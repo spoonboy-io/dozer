@@ -90,3 +90,19 @@ func TestCreateAndWrite(t *testing.T) {
 
 	removeTestStateFile(t)
 }
+
+func Test_DeleteProcessFromState(t *testing.T) {
+	wantSt := &state.State{
+		ExecutingProcesses: []int{3, 5},
+	}
+
+	testSt := &state.State{
+		ExecutingProcesses: []int{3, 4, 5},
+	}
+
+	testSt.DeleteProcessFromState(4)
+
+	if !reflect.DeepEqual(testSt, wantSt) {
+		t.Errorf("failed got %v wanted %v", testSt, wantSt)
+	}
+}
