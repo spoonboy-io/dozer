@@ -2,3 +2,4 @@
 .DS_Store
 mysql.env
 dozer.state
+webhook.yaml

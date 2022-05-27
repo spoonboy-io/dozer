@@ -8,18 +8,21 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/spoonboy-io/dozer/internal"
+	"github.com/spoonboy-io/dozer/internal/hook"
+	"github.com/spoonboy-io/reprise"
 
-	"github.com/spoonboy-io/dozer/internal/morpheus"
-	"github.com/spoonboy-io/dozer/internal/state"
+	"github.com/spoonboy-io/dozer/internal"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
+	"github.com/spoonboy-io/dozer/internal/morpheus"
+	"github.com/spoonboy-io/dozer/internal/state"
 	"github.com/spoonboy-io/koan"
 )
 
 const (
-	DB_CONFIG = "mysql.env"
+	DB_CONFIG   = "mysql.env"
+	HOOK_CONFIG = "webhook.yaml"
 )
 
 var (
@@ -48,7 +51,11 @@ func init() {
 		}
 	}
 
-	// TODO read in the webhook config
+	logger.Info("Loading webhook configuration file")
+	err = hook.ReadAndParseConfig(HOOK_CONFIG)
+	if err != nil {
+		logger.FatalError("Failed to read webhook configuration file", err)
+	}
 }
 
 // Shutdown runs on SIGINT and panic, we save the database poll state
@@ -64,11 +71,22 @@ func Shutdown(db *sql.DB) {
 }
 
 func main() {
+	// write a console banner
+	reprise.WriteSimple(&reprise.Banner{
+		Name:         "Dozer",
+		Description:  "Morpheus Processes with Webhooks",
+		Version:      version,
+		GoVersion:    goversion,
+		WebsiteURL:   "https://spoonboy.io",
+		VcsURL:       "https://github.com/spoonboy-io/dozer",
+		VcsName:      "Github",
+		EmailAddress: "hello@spoonboy.io",
+	})
+
 	// connect to database
 	var db *sql.DB
 	var err error
-	cnString := fmt.Sprintf("%s:%s@tcp(%s:3306)/morpheus", os.Getenv("MYSQL_USER"), os.Getenv("MYSQL_PASSWORD"), os.Getenv("MYSQL_SERVER"))
-	logger.Info(cnString)
+	cnString := fmt.Sprintf("%s:%s@tcp(%s:3306)/morpheus?parseTime=true", os.Getenv("MYSQL_USER"), os.Getenv("MYSQL_PASSWORD"), os.Getenv("MYSQL_SERVER"))
 	db, err = sql.Open("mysql", cnString)
 	if err != nil {
 		logger.FatalError("Failed to create database connection", err)
@@ -80,13 +98,6 @@ func main() {
 		logger.FatalError("Failed to connect to database", err)
 	}
 	logger.Info("Connected to database")
-
-	// add a watch so the hook can be hotloaded
-	go func() {
-		/*if err := watcher.Monitor(datasources, logger, mtx); err != nil {
-			logger.FatalError("Could not create the file watcher", err)
-		}*/
-	}()
 
 	go func() {
 		pollSecs := internal.POLL_INTERVAL

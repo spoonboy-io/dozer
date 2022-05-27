@@ -1,6 +1,8 @@
 package internal
 
-import "time"
+import (
+	"database/sql"
+)
 
 const (
 	POLL_INTERVAL = 5
@@ -18,62 +20,62 @@ type ProcessType struct {
 // Process is a struct to represent a morpheus process and all the possible
 // information reported by morpheus about the process
 type Process struct {
-	Id                   int       `db:"id"`
-	SubType              string    `db:"sub_type"`
-	UpdatedById          int       `db:"updated_by_id"`
-	OutputFormat         string    `db:"output_format"`
-	DateCreated          time.Time `db:"date_created"`
-	ServerName           string    `db:"server_name"`
-	CreatedById          int       `db:"created_by_id"`
-	ProcessTypeId        int       `db:"process_type_id"`
-	UpdatedBy            string    `db:"updated_by"`
-	UpdatedByDisplayName string    `db:"updated_by_display_name"`
-	Error                string    `db:"error"`
-	AppName              string    `db:"app_name"`
-	Succeess             bool      `db:"success""`
-	CreateByDisplayName  string    `db:"created_by_display_name"`
-	DisplayName          string    `db:"display_name"`
-	Input                string    `db:"input"`
-	AppId                int       `db:"app_id"`
-	Message              string    `db:"message"`
-	RefType              string    `db:"ref_type"`
-	JobTemplateId        int       `db:"job_template_id"`
-	ContainerName        string    `db:"container_name"`
-	Output               string    `db:"output"`
-	ApiKey               string    `db:"api_key"`
-	AccountId            int       `db:"account_id"`
-	StatusEta            int       `db:"status_eta"`
-	TimerSubCategory     string    `db:"timer_sub_category"`
-	ProcessTypeName      string    `db:"process_type_name"`
-	TaskSetName          string    `db:"task_set_name"`
-	ContainerId          int       `db:"container_id"`
-	JobTemplateName      string    `db:"job_template_name"`
-	TaskSetId            int       `db:"task_set_id"`
-	LastUpdated          time.Time `db:"last_updated"`
-	ServerGroupName      string    `db:"server_group_name"`
-	SubId                int       `db:"sub_id"`
-	Deleted              bool      `db:"deleted"`
-	TaskId               int       `db:"task_id"`
-	UniqueId             string    `db:"unique_id"`
-	Percent              float32   `db:"percent"`
-	TimerCategory        string    `db:"timer_category"`
-	Reason               string    `db:"reason"`
-	EndDate              time.Time `db:"end_date"`
-	Duration             int       `db:"duration"`
-	InstanceName         string    `db:"instance_name"`
-	StartDate            time.Time `db:"start_date""`
-	ZoneId               int       `db:"zone_id"`
-	InputFormat          string    `db:"input_format"`
-	ServerID             int       `db:"server_id"`
-	ExitCode             string    `db:"exit_code"`
-	IntegrationId        int       `db:"integration_id"`
-	RefId                int       `db:"ref_id"`
-	InstanceId           int       `db:"instance_id"`
-	ServergroupId        int       `db:"server_group_id"`
-	TaskName             string    `db:"task_name"`
-	CreatedBy            string    `db:"created_by"`
-	Status               string    `db:"status"`
-	ProcessResult        string    `db:"process_result"`
-	Description          string    `db:"description"`
-	EventTitle           string    `db:"event_title"`
+	Id                   int             `db:"id"`
+	SubType              sql.NullString  `db:"sub_type"`
+	UpdatedById          sql.NullInt64   `db:"updated_by_id"`
+	OutputFormat         sql.NullString  `db:"output_format"`
+	DateCreated          sql.NullTime    `db:"date_created"`
+	ServerName           sql.NullString  `db:"server_name"`
+	CreatedById          sql.NullInt64   `db:"created_by_id"`
+	ProcessTypeId        sql.NullInt64   `db:"process_type_id"`
+	UpdatedBy            sql.NullString  `db:"updated_by"`
+	UpdatedByDisplayName sql.NullString  `db:"updated_by_display_name"`
+	Error                sql.NullString  `db:"error"`
+	AppName              sql.NullString  `db:"app_name"`
+	Success              sql.NullBool    `db:"success"`
+	CreatedByDisplayName sql.NullString  `db:"created_by_display_name"`
+	DisplayName          sql.NullString  `db:"display_name"`
+	Input                sql.NullString  `db:"input"`
+	AppId                sql.NullInt64   `db:"app_id"`
+	Message              sql.NullString  `db:"message"`
+	RefType              sql.NullString  `db:"ref_type"`
+	JobTemplateId        sql.NullInt64   `db:"job_template_id"`
+	ContainerName        sql.NullString  `db:"container_name"`
+	Output               sql.NullString  `db:"output"`
+	ApiKey               sql.NullString  `db:"api_key"`
+	AccountId            sql.NullInt64   `db:"account_id"`
+	StatusEta            sql.NullInt64   `db:"status_eta"`
+	TimerSubCategory     sql.NullString  `db:"timer_sub_category"`
+	ProcessTypeName      sql.NullString  `db:"process_type_name"`
+	TaskSetName          sql.NullString  `db:"task_set_name"`
+	ContainerId          sql.NullInt64   `db:"container_id"`
+	JobTemplateName      sql.NullString  `db:"job_template_name"`
+	TaskSetId            sql.NullInt64   `db:"task_set_id"`
+	LastUpdated          sql.NullTime    `db:"last_updated"`
+	ServerGroupName      sql.NullString  `db:"server_group_name"`
+	SubId                sql.NullInt64   `db:"sub_id"`
+	Deleted              []byte          `db:"deleted"` // TODO temporary, could trip us up, it's a BOOL really
+	TaskId               sql.NullInt64   `db:"task_id"`
+	UniqueId             sql.NullString  `db:"unique_id"`
+	Percent              sql.NullFloat64 `db:"percent"`
+	TimerCategory        sql.NullString  `db:"timer_category"`
+	Reason               sql.NullString  `db:"reason"`
+	EndDate              sql.NullTime    `db:"end_date"`
+	Duration             sql.NullInt64   `db:"duration"`
+	InstanceName         sql.NullString  `db:"instance_name"`
+	StartDate            sql.NullTime    `db:"start_date""`
+	ZoneId               sql.NullInt64   `db:"zone_id"`
+	InputFormat          sql.NullString  `db:"input_format"`
+	ServerID             sql.NullInt64   `db:"server_id"`
+	ExitCode             sql.NullString  `db:"exit_code"`
+	IntegrationId        sql.NullInt64   `db:"integration_id"`
+	RefId                sql.NullInt64   `db:"ref_id"`
+	InstanceId           sql.NullInt64   `db:"instance_id"`
+	ServergroupId        sql.NullInt64   `db:"server_group_id"`
+	TaskName             sql.NullString  `db:"task_name"`
+	CreatedBy            sql.NullString  `db:"created_by"`
+	Status               string          `db:"status"`
+	ProcessResult        sql.NullString  `db:"process_result"`
+	Description          sql.NullString  `db:"description"`
+	EventTitle           sql.NullString  `db:"event_title"`
 }
