@@ -39,12 +39,10 @@ func GetProcesses(db *sql.DB, st *state.State) error {
 		} else {
 			// status is complete or failed so compare row to hook configuration
 			// TODO potentially we should use goroutine so we don't block
-			if err = hook.CheckProcess(process); err != nil {
-				return err
-			}
+			hook.CheckProcess(process)
 		}
 		lastProcessId = process.Id
-		fmt.Printf("Process: %+v\n\n\n", process)
+		//fmt.Printf("Process: %+v\n\n\n", process)
 	}
 
 	// update state
@@ -83,9 +81,7 @@ func CheckExecuting(db *sql.DB, st *state.State) error {
 		fmt.Println(process)
 		if process.Status != EXECUTING {
 			// status is complete or failed so compare row to hook configuration
-			if err = hook.CheckProcess(process); err != nil {
-				return err
-			}
+			hook.CheckProcess(process)
 			// delete from state
 			st.DeleteProcessFromState(process.Id)
 		}
