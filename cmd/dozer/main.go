@@ -49,6 +49,13 @@ func init() {
 		if err = st.ReadAndParse(); err != nil {
 			logger.FatalError("Failed to read or parse saved application state", err)
 		}
+	} else {
+		// first run, and we probably don't want to iterate through previous processes
+		// so we capture latest process, start the poll from there. On subsequent application
+		// launches we will use the state file, if it is gone, we will be back here, and some
+		// webhooks will not have been fired
+
+		// TODO
 	}
 
 	logger.Info("Loading webhook configuration file")
@@ -98,6 +105,11 @@ func main() {
 		logger.FatalError("Failed to connect to database", err)
 	}
 	logger.Info("Connected to database")
+
+	logger.Info("Loading process types from database")
+	if err := morpheus.GetProcessTypes(db); err != nil {
+		logger.FatalError("Failed to load process types", err)
+	}
 
 	go func() {
 		pollSecs := internal.POLL_INTERVAL

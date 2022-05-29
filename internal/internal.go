@@ -11,11 +11,15 @@ const (
 // ProcessType is a struct to represent a morpheus process type
 // image_name and description are omitted as they appear to be unused
 type ProcessType struct {
-	Id        int    `db:"id"`
-	Code      string `db:"code"`
-	Name      string `db:"name"`
-	ImageCode string `db:"image_code"`
+	Id        int            `db:"id"`
+	Code      sql.NullString `db:"code"`
+	Name      sql.NullString `db:"name"`
+	ImageCode sql.NullString `db:"image_code"`
 }
+
+// ProcessTypes uses process_type code as key and name as value
+// so we can use code in the YAML config but look up against name in the process table
+var ProcessTypes = map[string]string{}
 
 // Process is a struct to represent a morpheus process and all the possible
 // information reported by morpheus about the process

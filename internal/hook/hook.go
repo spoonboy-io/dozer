@@ -50,6 +50,13 @@ func ReadAndParseConfig(cfgFile string) error {
 func CheckProcess(process internal.Process) {
 	// go through all the hook config
 	for _, h := range config {
+		// config uses code we need to search on name, we swap the code for the name in the config
+		processName, err := getProcessTypeName(h.Triggers.ProcessType)
+		if err != nil {
+			// TODO we choose to move on for now
+			continue
+		}
+		h.Triggers.ProcessType = processName
 
 		if fire := checkStatus(process, h.Hook); fire {
 			fmt.Println("firing on status", process.Id, process.Status)
@@ -78,7 +85,6 @@ func CheckProcess(process internal.Process) {
 	}
 }
 
-// checkStatus
 func checkStatus(process internal.Process, hook Hook) bool {
 	var fire bool
 	if hook.Triggers.Status == process.Status {
@@ -113,7 +119,6 @@ func checkStatus(process internal.Process, hook Hook) bool {
 	return fire
 }
 
-// checkProcessType
 func checkProcessType(process internal.Process, hook Hook) bool {
 	var fire bool
 	if hook.Triggers.ProcessType == process.ProcessTypeName.String {
@@ -148,7 +153,6 @@ func checkProcessType(process internal.Process, hook Hook) bool {
 	return fire
 }
 
-// checkTaskName
 func checkTaskName(process internal.Process, hook Hook) bool {
 	var fire bool
 	if hook.Triggers.TaskName == process.TaskName.String {
@@ -183,7 +187,6 @@ func checkTaskName(process internal.Process, hook Hook) bool {
 	return fire
 }
 
-// checkAccountId
 func checkAccountId(process internal.Process, hook Hook) bool {
 	var fire bool
 	if hook.Triggers.AccountId == int(process.AccountId.Int64) {
@@ -218,7 +221,6 @@ func checkAccountId(process internal.Process, hook Hook) bool {
 	return fire
 }
 
-// checkCreatedBy
 func checkCreatedBy(process internal.Process, hook Hook) bool {
 	var fire bool
 	if hook.Triggers.CreatedBy == process.CreatedBy.String {
@@ -250,5 +252,17 @@ func checkCreatedBy(process internal.Process, hook Hook) bool {
 			}
 		}
 	}
+
 	return fire
+}
+
+// getProcessTypeName checks the key exists and returns it if found, or errors
+func getProcessTypeName(code string) (string, error) {
+	if code != "" {
+		if _, ok := internal.ProcessTypes[code]; !ok {
+			return "", fmt.Errorf("ProcessType not found, check YAML")
+		}
+		return internal.ProcessTypes[code], nil
+	}
+	return "", nil
 }
