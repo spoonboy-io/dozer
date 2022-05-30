@@ -77,7 +77,6 @@ func CheckExecuting(db *sql.DB, st *state.State) error {
 		if err != nil {
 			return err
 		}
-		fmt.Println(process)
 		if process.Status != EXECUTING {
 			// status is complete or failed so compare row to hook configuration
 			hook.CheckProcess(process)
