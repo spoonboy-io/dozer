@@ -19,7 +19,7 @@ type ProcessType struct {
 
 // ProcessTypes uses process_type code as key and name as value
 // so we can use code in the YAML config but look up against name in the process table
-var ProcessTypes = map[string]string{}
+var ProcessTypes map[string]string
 
 // Process is a struct to represent a morpheus process and all the possible
 // information reported by morpheus about the process

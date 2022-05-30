@@ -42,7 +42,6 @@ func GetProcesses(db *sql.DB, st *state.State) error {
 			hook.CheckProcess(process)
 		}
 		lastProcessId = process.Id
-		//fmt.Printf("Process: %+v\n\n\n", process)
 	}
 
 	// update state

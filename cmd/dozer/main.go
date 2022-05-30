@@ -107,7 +107,8 @@ func main() {
 	logger.Info("Connected to database")
 
 	logger.Info("Loading process types from database")
-	if err := morpheus.GetProcessTypes(db); err != nil {
+	processTypes := map[string]string{}
+	if err := morpheus.GetProcessTypes(db, processTypes); err != nil {
 		logger.FatalError("Failed to load process types", err)
 	}
 
