@@ -6,6 +6,8 @@ import (
 	"github.com/spoonboy-io/dozer/internal"
 )
 
+var count int
+
 // CheckProcess will check a process against the configuration to determine if
 // it is an event that should trigger a call webhook
 func CheckProcess(process *internal.Process) {
@@ -13,11 +15,9 @@ func CheckProcess(process *internal.Process) {
 	for i := range config {
 		// config uses code we need to search on name, we swap the code for the name in the config
 		processName, err := getProcessTypeName(config[i].Triggers.ProcessType)
-		if err != nil {
-			// TODO we choose to move on for now
-			continue
+		if err == nil {
+			config[i].Triggers.ProcessType = processName
 		}
-		config[i].Triggers.ProcessType = processName
 
 		if fire := checkStatus(process, &config[i].Hook); fire {
 			fmt.Println("firing on status", process.Id, process.Status)
