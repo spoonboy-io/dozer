@@ -263,31 +263,31 @@ func TestCheckProcessesLogic(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// status
-			gotFireStatus := checkStatus(tc.process, tc.hook)
+			gotFireStatus := checkStatus(&tc.process, &tc.hook)
 			if gotFireStatus != tc.wantFireStatus {
 				t.Errorf("checkStatus wanted %v got %v", tc.wantFireStatus, gotFireStatus)
 			}
 
 			// processType
-			gotFireProcessType := checkProcessType(tc.process, tc.hook)
+			gotFireProcessType := checkProcessType(&tc.process, &tc.hook)
 			if gotFireProcessType != tc.wantFireProcessType {
 				t.Errorf("checkProcessType wanted %v got %v", tc.wantFireProcessType, gotFireProcessType)
 			}
 
 			// taskName
-			gotFireTaskName := checkTaskName(tc.process, tc.hook)
+			gotFireTaskName := checkTaskName(&tc.process, &tc.hook)
 			if gotFireTaskName != tc.wantFireTaskName {
 				t.Errorf("checkTaskName wanted %v got %v", tc.wantFireTaskName, gotFireTaskName)
 			}
 
 			// AccountId
-			gotFireAccountId := checkAccountId(tc.process, tc.hook)
+			gotFireAccountId := checkAccountId(&tc.process, &tc.hook)
 			if gotFireAccountId != tc.wantFireAccountId {
 				t.Errorf("checkAccountId wanted %v got %v", tc.wantFireAccountId, gotFireAccountId)
 			}
 
 			// CreatedBy
-			gotFireCreatedBy := checkCreatedBy(tc.process, tc.hook)
+			gotFireCreatedBy := checkCreatedBy(&tc.process, &tc.hook)
 			if gotFireCreatedBy != tc.wantFireCreatedBy {
 				t.Errorf("checkCreatedBy wanted %v got %v", tc.wantFireCreatedBy, gotFireCreatedBy)
 			}

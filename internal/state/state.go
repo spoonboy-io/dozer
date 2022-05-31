@@ -18,7 +18,7 @@ type State struct {
 }
 
 // HasSavedState performs a simple check to discover saved state from an application shutdown
-func (s *State) HasSavedState() bool {
+func (*State) HasSavedState() bool {
 	state := true
 	if _, err := os.Stat(FILE_NAME); errors.Is(err, os.ErrNotExist) {
 		state = false

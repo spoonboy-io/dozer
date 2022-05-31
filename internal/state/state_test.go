@@ -23,7 +23,9 @@ func writeTestStateFile(t *testing.T, st *state.State) {
 }
 
 func removeTestStateFile(t *testing.T) {
-	os.Remove(state.FILE_NAME)
+	if err := os.Remove(state.FILE_NAME); err != nil {
+		t.Fatal("Could not remove test state file")
+	}
 }
 
 func TestHasSavedState(t *testing.T) {

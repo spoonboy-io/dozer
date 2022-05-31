@@ -121,7 +121,7 @@ func main() {
 			logger.Info("Using POLL_INTERVAL_SECCONDS environment variable")
 		}
 		pollInterval := time.NewTicker(time.Duration(pollSecs) * time.Second)
-		for _ = range pollInterval.C {
+		for range pollInterval.C {
 			/* temp monitor */
 			fmt.Printf("lastProcessId: %d\n", st.LastPollProcessId)
 			fmt.Printf("ExecutingProcesses: %v\n", st.ExecutingProcesses)

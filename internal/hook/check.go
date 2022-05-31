@@ -10,43 +10,43 @@ import (
 // it is an event that should trigger a call webhook
 func CheckProcess(process internal.Process) {
 	// go through all the hook config
-	for _, h := range config {
+	for i := range config {
 		// config uses code we need to search on name, we swap the code for the name in the config
-		processName, err := getProcessTypeName(h.Triggers.ProcessType)
+		processName, err := getProcessTypeName(config[i].Triggers.ProcessType)
 		if err != nil {
 			// TODO we choose to move on for now
 			continue
 		}
-		h.Triggers.ProcessType = processName
+		config[i].Triggers.ProcessType = processName
 
-		if fire := checkStatus(process, h.Hook); fire {
+		if fire := checkStatus(&process, &config[i].Hook); fire {
 			fmt.Println("firing on status", process.Id, process.Status)
 			continue
 		}
 
-		if fire := checkProcessType(process, h.Hook); fire {
+		if fire := checkProcessType(&process, &config[i].Hook); fire {
 			fmt.Println("firing on process type", process.Id, process.ProcessTypeName.String)
 			continue
 		}
 
-		if fire := checkTaskName(process, h.Hook); fire {
+		if fire := checkTaskName(&process, &config[i].Hook); fire {
 			fmt.Println("firing on task name", process.Id, process.TaskName.String)
 			continue
 		}
 
-		if fire := checkAccountId(process, h.Hook); fire {
+		if fire := checkAccountId(&process, &config[i].Hook); fire {
 			fmt.Println("firing on account id", process.Id, process.AccountId.Int64)
 			continue
 		}
 
-		if fire := checkCreatedBy(process, h.Hook); fire {
+		if fire := checkCreatedBy(&process, &config[i].Hook); fire {
 			fmt.Println("firing on created by", process.Id, process.CreatedBy.String)
 			continue
 		}
 	}
 }
 
-func checkStatus(process internal.Process, hook Hook) bool {
+func checkStatus(process *internal.Process, hook *Hook) bool {
 	var fire bool
 	if process.Status == "" {
 		return fire
@@ -97,7 +97,7 @@ func checkStatus(process internal.Process, hook Hook) bool {
 	return fire
 }
 
-func checkProcessType(process internal.Process, hook Hook) bool {
+func checkProcessType(process *internal.Process, hook *Hook) bool {
 	var fire bool
 	if process.ProcessTypeName.String == "" {
 		return fire
@@ -143,7 +143,7 @@ func checkProcessType(process internal.Process, hook Hook) bool {
 	return fire
 }
 
-func checkTaskName(process internal.Process, hook Hook) bool {
+func checkTaskName(process *internal.Process, hook *Hook) bool {
 	var fire bool
 	if process.TaskName.String == "" {
 		return fire
@@ -189,7 +189,7 @@ func checkTaskName(process internal.Process, hook Hook) bool {
 	return fire
 }
 
-func checkAccountId(process internal.Process, hook Hook) bool {
+func checkAccountId(process *internal.Process, hook *Hook) bool {
 	var fire bool
 	if int(process.AccountId.Int64) == 0 {
 		return fire
@@ -235,7 +235,7 @@ func checkAccountId(process internal.Process, hook Hook) bool {
 	return fire
 }
 
-func checkCreatedBy(process internal.Process, hook Hook) bool {
+func checkCreatedBy(process *internal.Process, hook *Hook) bool {
 	var fire bool
 	if process.CreatedBy.String == "" {
 		return fire
