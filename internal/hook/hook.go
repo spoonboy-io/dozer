@@ -105,12 +105,16 @@ func checkStatus(process internal.Process, hook Hook) bool {
 			fire = false
 			if hook.Triggers.ProcessType == process.ProcessTypeName.String {
 				fire = true
+			} else {
+				return fire
 			}
 		}
 		if hook.Triggers.TaskName != "" {
 			fire = false
 			if hook.Triggers.TaskName == process.TaskName.String {
 				fire = true
+			} else {
+				return fire
 			}
 		}
 
@@ -118,6 +122,8 @@ func checkStatus(process internal.Process, hook Hook) bool {
 			fire = false
 			if hook.Triggers.AccountId == int(process.AccountId.Int64) {
 				fire = true
+			} else {
+				return fire
 			}
 		}
 
@@ -125,9 +131,12 @@ func checkStatus(process internal.Process, hook Hook) bool {
 			fire = false
 			if hook.Triggers.CreatedBy == process.CreatedBy.String {
 				fire = true
+			} else {
+				return fire
 			}
 		}
 	}
+
 	return fire
 }
 
@@ -142,12 +151,16 @@ func checkProcessType(process internal.Process, hook Hook) bool {
 			fire = false
 			if hook.Triggers.Status == process.Status {
 				fire = true
+			} else {
+				return fire
 			}
 		}
 		if hook.Triggers.TaskName != "" {
 			fire = false
 			if hook.Triggers.TaskName == process.TaskName.String {
 				fire = true
+			} else {
+				return fire
 			}
 		}
 
@@ -155,6 +168,8 @@ func checkProcessType(process internal.Process, hook Hook) bool {
 			fire = false
 			if hook.Triggers.AccountId == int(process.AccountId.Int64) {
 				fire = true
+			} else {
+				return fire
 			}
 		}
 
@@ -162,9 +177,12 @@ func checkProcessType(process internal.Process, hook Hook) bool {
 			fire = false
 			if hook.Triggers.CreatedBy == process.CreatedBy.String {
 				fire = true
+			} else {
+				return fire
 			}
 		}
 	}
+
 	return fire
 }
 
@@ -179,12 +197,16 @@ func checkTaskName(process internal.Process, hook Hook) bool {
 			fire = false
 			if hook.Triggers.Status == process.Status {
 				fire = true
+			} else {
+				return fire
 			}
 		}
 		if hook.Triggers.ProcessType != "" {
 			fire = false
 			if hook.Triggers.ProcessType == process.ProcessTypeName.String {
 				fire = true
+			} else {
+				return fire
 			}
 		}
 
@@ -192,6 +214,8 @@ func checkTaskName(process internal.Process, hook Hook) bool {
 			fire = false
 			if hook.Triggers.AccountId == int(process.AccountId.Int64) {
 				fire = true
+			} else {
+				return fire
 			}
 		}
 
@@ -199,9 +223,12 @@ func checkTaskName(process internal.Process, hook Hook) bool {
 			fire = false
 			if hook.Triggers.CreatedBy == process.CreatedBy.String {
 				fire = true
+			} else {
+				return fire
 			}
 		}
 	}
+
 	return fire
 }
 
@@ -216,12 +243,16 @@ func checkAccountId(process internal.Process, hook Hook) bool {
 			fire = false
 			if hook.Triggers.ProcessType == process.ProcessTypeName.String {
 				fire = true
+			} else {
+				return fire
 			}
 		}
 		if hook.Triggers.TaskName != "" {
 			fire = false
 			if hook.Triggers.TaskName == process.TaskName.String {
 				fire = true
+			} else {
+				return fire
 			}
 		}
 
@@ -229,6 +260,8 @@ func checkAccountId(process internal.Process, hook Hook) bool {
 			fire = false
 			if hook.Triggers.Status == process.Status {
 				fire = true
+			} else {
+				return fire
 			}
 		}
 
@@ -236,9 +269,12 @@ func checkAccountId(process internal.Process, hook Hook) bool {
 			fire = false
 			if hook.Triggers.CreatedBy == process.CreatedBy.String {
 				fire = true
+			} else {
+				return fire
 			}
 		}
 	}
+
 	return fire
 }
 
@@ -253,12 +289,16 @@ func checkCreatedBy(process internal.Process, hook Hook) bool {
 			fire = false
 			if hook.Triggers.ProcessType == process.ProcessTypeName.String {
 				fire = true
+			} else {
+				return fire
 			}
 		}
 		if hook.Triggers.TaskName != "" {
 			fire = false
 			if hook.Triggers.TaskName == process.TaskName.String {
 				fire = true
+			} else {
+				return fire
 			}
 		}
 
@@ -266,6 +306,8 @@ func checkCreatedBy(process internal.Process, hook Hook) bool {
 			fire = false
 			if hook.Triggers.AccountId == int(process.AccountId.Int64) {
 				fire = true
+			} else {
+				return fire
 			}
 		}
 
@@ -273,6 +315,8 @@ func checkCreatedBy(process internal.Process, hook Hook) bool {
 			fire = false
 			if hook.Triggers.Status == process.Status {
 				fire = true
+			} else {
+				return fire
 			}
 		}
 	}

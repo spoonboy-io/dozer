@@ -7,9 +7,9 @@ import (
 	"github.com/spoonboy-io/dozer/internal"
 )
 
-// TestCheckProcess contains testcases that checks that hooks fire correctly based on
-// the configuration when test processes are inspected. We are not testing the webhook call
-// white box testing unexported functions
+// TestCheckProcessLogic contains testcases that checks that hooks fire correctly based on
+// the configuration when test processes are inspected. We are not testing the webhook call itself
+// we are whitebox testing as we are calling unexported functions
 func TestCheckProcessesLogic(t *testing.T) {
 	testCases := []struct {
 		name                string
@@ -163,14 +163,107 @@ func TestCheckProcessesLogic(t *testing.T) {
 			},
 			wantFireCreatedBy: false,
 		},
+
+		// Combination additive test cases from here to cover remaining function logic
+
+		{
+			name: "Should not fire, requires additional matches 1",
+			process: internal.Process{
+				Status: "complete",
+			},
+			hook: Hook{
+				Triggers: Trigger{
+					Status:    "complete",
+					AccountId: 2,
+				},
+			},
+			wantFireStatus: false,
+		},
+		{
+			name: "Should not fire, requires additional matches 1",
+			process: internal.Process{
+				Status:          "complete",
+				ProcessTypeName: sql.NullString{String: "Test Process Name"},
+				AccountId:       sql.NullInt64{Int64: 2},
+			},
+			hook: Hook{
+				Triggers: Trigger{
+					Status:      "complete",
+					ProcessType: "reconfigure",
+					AccountId:   2,
+				},
+			},
+			wantFireStatus: false,
+		},
+		{
+			name: "Should not fire, requires additional matches 3",
+			process: internal.Process{
+				Status:          "complete",
+				ProcessTypeName: sql.NullString{String: "Test Process Name"},
+				TaskName:        sql.NullString{String: "Test Task Name"},
+				AccountId:       sql.NullInt64{Int64: 2},
+			},
+			hook: Hook{
+				Triggers: Trigger{
+					Status:      "complete",
+					ProcessType: "Test Process Name",
+					TaskName:    "Different Task Name",
+					AccountId:   2,
+				},
+			},
+			wantFireStatus: false,
+		},
+		{
+			name: "Should not fire, requires additional matches 4",
+			process: internal.Process{
+				Status:          "complete",
+				ProcessTypeName: sql.NullString{String: "Test Process Name"},
+				TaskName:        sql.NullString{String: "Test Task Name"},
+				CreatedBy:       sql.NullString{String: "Test User"},
+				AccountId:       sql.NullInt64{Int64: 2},
+			},
+			hook: Hook{
+				Triggers: Trigger{
+					Status:      "complete",
+					ProcessType: "Test Process Name",
+					TaskName:    "Test Task Name",
+					CreatedBy:   "Admin",
+					AccountId:   2,
+				},
+			},
+			wantFireStatus: false,
+		},
+		{
+			name: "Should fire, all triggers match",
+			process: internal.Process{
+				Status:          "complete",
+				ProcessTypeName: sql.NullString{String: "Test Process Name"},
+				TaskName:        sql.NullString{String: "Test Task Name"},
+				CreatedBy:       sql.NullString{String: "Test User"},
+				AccountId:       sql.NullInt64{Int64: 2},
+			},
+			hook: Hook{
+				Triggers: Trigger{
+					Status:      "complete",
+					ProcessType: "Test Process Name",
+					TaskName:    "Test Task Name",
+					CreatedBy:   "Test User",
+					AccountId:   2,
+				},
+			},
+			// only want event will fire in the code
+			// we use continue to move to the next hook
+			wantFireStatus:      true,
+			wantFireProcessType: true,
+			wantFireTaskName:    true,
+			wantFireCreatedBy:   true,
+			wantFireAccountId:   true,
+		},
 	}
 
+	// status test
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-
-			//fmt.Printf("Hook: %+v\n", tc.hook)
-			//fmt.Printf("Process: %+v\n", tc.process)
-
 			// status
 			gotFireStatus := checkStatus(tc.process, tc.hook)
 			if gotFireStatus != tc.wantFireStatus {
@@ -200,6 +293,7 @@ func TestCheckProcessesLogic(t *testing.T) {
 			if gotFireCreatedBy != tc.wantFireCreatedBy {
 				t.Errorf("checkCreatedBy wanted %v got %v", tc.wantFireCreatedBy, gotFireCreatedBy)
 			}
+
 		})
 	}
 
