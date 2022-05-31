@@ -54,7 +54,7 @@ func TestHasSavedState(t *testing.T) {
 func TestReadAndParse(t *testing.T) {
 	wantSt := &state.State{
 		LastPollProcessId:  10,
-		LastPollTimestamp:  time.Now().Round(0), // strip monotonic
+		LastPollTimestamp:  time.Now(), //.Round(0), // strip monotonic
 		ExecutingProcesses: []int{3, 4, 5},
 	}
 	writeTestStateFile(t, wantSt)
