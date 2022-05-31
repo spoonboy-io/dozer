@@ -18,17 +18,21 @@ type Hooks []struct {
 
 // Hook represents the configuration of a single webhook
 type Hook struct {
-	Description string `yaml:"description"`
-	URL         string `yaml:"url"`
-	Method      string `yaml:"method"`
-	Token       string `yaml:"token"`
-	Triggers    struct {
-		Status      string `yaml:"status"`
-		ProcessType string `yaml:"processType"`
-		TaskName    string `yaml:"taskName"`
-		AccountId   int    `yaml:"accountId"`
-		CreatedBy   string `yaml:"createdBy"`
-	} `yaml:"triggers"`
+	Description string  `yaml:"description"`
+	URL         string  `yaml:"url"`
+	Method      string  `yaml:"method"`
+	Token       string  `yaml:"token"`
+	Triggers    Trigger `yaml:"triggers"`
+}
+
+// Trigger represents the trigger configuration options which can be set in the YAML.
+// They are additive, in that all set, must be satisfied for the hook event to be fired
+type Trigger struct {
+	Status      string `yaml:"status"`
+	ProcessType string `yaml:"processType"`
+	TaskName    string `yaml:"taskName"`
+	AccountId   int    `yaml:"accountId"`
+	CreatedBy   string `yaml:"createdBy"`
 }
 
 // ReadAndParseConfig reads the contents of the YAML hook config filer
@@ -87,6 +91,14 @@ func CheckProcess(process internal.Process) {
 
 func checkStatus(process internal.Process, hook Hook) bool {
 	var fire bool
+	if process.Status == "" {
+		return fire
+	}
+	if process.Status == "executing" {
+		// we should never be in here as processes with executing status
+		// should not be passed for inspection, we monitor until done/failed
+		return fire
+	}
 	if hook.Triggers.Status == process.Status {
 		fire = true
 		if hook.Triggers.ProcessType != "" {
@@ -121,6 +133,9 @@ func checkStatus(process internal.Process, hook Hook) bool {
 
 func checkProcessType(process internal.Process, hook Hook) bool {
 	var fire bool
+	if process.ProcessTypeName.String == "" {
+		return fire
+	}
 	if hook.Triggers.ProcessType == process.ProcessTypeName.String {
 		fire = true
 		if hook.Triggers.Status != "" {
@@ -155,6 +170,9 @@ func checkProcessType(process internal.Process, hook Hook) bool {
 
 func checkTaskName(process internal.Process, hook Hook) bool {
 	var fire bool
+	if process.TaskName.String == "" {
+		return fire
+	}
 	if hook.Triggers.TaskName == process.TaskName.String {
 		fire = true
 		if hook.Triggers.Status != "" {
@@ -189,6 +207,9 @@ func checkTaskName(process internal.Process, hook Hook) bool {
 
 func checkAccountId(process internal.Process, hook Hook) bool {
 	var fire bool
+	if int(process.AccountId.Int64) == 0 {
+		return fire
+	}
 	if hook.Triggers.AccountId == int(process.AccountId.Int64) {
 		fire = true
 		if hook.Triggers.ProcessType != "" {
@@ -223,6 +244,9 @@ func checkAccountId(process internal.Process, hook Hook) bool {
 
 func checkCreatedBy(process internal.Process, hook Hook) bool {
 	var fire bool
+	if process.CreatedBy.String == "" {
+		return fire
+	}
 	if hook.Triggers.CreatedBy == process.CreatedBy.String {
 		fire = true
 		if hook.Triggers.ProcessType != "" {
