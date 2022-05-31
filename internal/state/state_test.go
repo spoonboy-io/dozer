@@ -68,7 +68,7 @@ func TestReadAndParse(t *testing.T) {
 		// github actions fails, suspect a diff in Mac/linux
 		// the structs appear identical in content in the output
 		// before we fail let's try inspect the two structs properties
-		if gotSt.LastPollTimestamp != wantSt.LastPollTimestamp {
+		if gotSt.LastPollProcessId != wantSt.LastPollProcessId {
 			t.Errorf("failed got %v wanted %v", gotSt, wantSt)
 		}
 	}
