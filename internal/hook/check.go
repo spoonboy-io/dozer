@@ -6,8 +6,6 @@ import (
 	"github.com/spoonboy-io/dozer/internal"
 )
 
-var count int
-
 // CheckProcess will check a process against the configuration to determine if
 // it is an event that should trigger a call webhook
 func CheckProcess(process *internal.Process) {
