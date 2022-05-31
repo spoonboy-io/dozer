@@ -7,9 +7,9 @@ import (
 	"github.com/spoonboy-io/dozer/internal"
 )
 
-// TestCheckProcessLogic contains testcases that checks that hooks fire correctly based on
-// the configuration when test processes are inspected. We are not testing the webhook call itself
-// we are whitebox testing as we are calling unexported functions
+// TestCheckProcessLogic contains test cases that checks that hooks fire correctly based on
+// the hook configuration when test processes are inspected. We are not testing the webhook call itself here,
+// we are whitebox testing as we are calling unexported functions from the package
 func TestCheckProcessesLogic(t *testing.T) {
 	testCases := []struct {
 		name                string
@@ -165,7 +165,6 @@ func TestCheckProcessesLogic(t *testing.T) {
 		},
 
 		// Combination additive test cases from here to cover remaining function logic
-
 		{
 			name: "Should not fire, requires additional matches 1",
 			process: internal.Process{
@@ -251,8 +250,8 @@ func TestCheckProcessesLogic(t *testing.T) {
 					AccountId:   2,
 				},
 			},
-			// only want event will fire in the code
-			// we use continue to move to the next hook
+			// NB. only one event will fire in the code as we use 'continue' to move to the next hook
+			// but in our test loop multiple fire events will occur. Expected.
 			wantFireStatus:      true,
 			wantFireProcessType: true,
 			wantFireTaskName:    true,
@@ -261,7 +260,6 @@ func TestCheckProcessesLogic(t *testing.T) {
 		},
 	}
 
-	// status test
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// status
