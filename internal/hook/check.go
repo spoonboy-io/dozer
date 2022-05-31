@@ -8,7 +8,7 @@ import (
 
 // CheckProcess will check a process against the configuration to determine if
 // it is an event that should trigger a call webhook
-func CheckProcess(process internal.Process) {
+func CheckProcess(process *internal.Process) {
 	// go through all the hook config
 	for i := range config {
 		// config uses code we need to search on name, we swap the code for the name in the config
@@ -19,27 +19,27 @@ func CheckProcess(process internal.Process) {
 		}
 		config[i].Triggers.ProcessType = processName
 
-		if fire := checkStatus(&process, &config[i].Hook); fire {
+		if fire := checkStatus(process, &config[i].Hook); fire {
 			fmt.Println("firing on status", process.Id, process.Status)
 			continue
 		}
 
-		if fire := checkProcessType(&process, &config[i].Hook); fire {
+		if fire := checkProcessType(process, &config[i].Hook); fire {
 			fmt.Println("firing on process type", process.Id, process.ProcessTypeName.String)
 			continue
 		}
 
-		if fire := checkTaskName(&process, &config[i].Hook); fire {
+		if fire := checkTaskName(process, &config[i].Hook); fire {
 			fmt.Println("firing on task name", process.Id, process.TaskName.String)
 			continue
 		}
 
-		if fire := checkAccountId(&process, &config[i].Hook); fire {
+		if fire := checkAccountId(process, &config[i].Hook); fire {
 			fmt.Println("firing on account id", process.Id, process.AccountId.Int64)
 			continue
 		}
 
-		if fire := checkCreatedBy(&process, &config[i].Hook); fire {
+		if fire := checkCreatedBy(process, &config[i].Hook); fire {
 			fmt.Println("firing on created by", process.Id, process.CreatedBy.String)
 			continue
 		}

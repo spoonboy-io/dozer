@@ -39,7 +39,7 @@ func GetProcesses(db *sql.DB, st *state.State) error {
 		} else {
 			// status is complete or failed so compare row to hook configuration
 			// TODO potentially we should use goroutine so we don't block
-			hook.CheckProcess(process)
+			hook.CheckProcess(&process)
 		}
 		lastProcessId = process.Id
 	}
@@ -79,7 +79,7 @@ func CheckExecuting(db *sql.DB, st *state.State) error {
 		}
 		if process.Status != EXECUTING {
 			// status is complete or failed so compare row to hook configuration
-			hook.CheckProcess(process)
+			hook.CheckProcess(&process)
 			// delete from state
 			st.DeleteProcessFromState(process.Id)
 		}
