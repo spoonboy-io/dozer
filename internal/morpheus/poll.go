@@ -14,11 +14,12 @@ import (
 )
 
 const (
-	COMPLETE  = "complete"
-	FAILED    = "failed"
 	EXECUTING = "executing"
 )
 
+// GetProcesses polls the database for processes higher than the store latestProcessId
+// if the process is found to be executing it will be tracked, otherwise it is passed on for
+// checking against the webhook configuration
 func GetProcesses(db *sql.DB, st *state.State) error {
 	rows, err := db.Query("SELECT * FROM process where id > ?;", st.LastPollProcessId)
 	if err != nil {
@@ -53,6 +54,9 @@ func GetProcesses(db *sql.DB, st *state.State) error {
 	return nil
 }
 
+// CheckExecuting uses state to obtain processes being tracked as 'executing', it performs
+// an SQL query which checks their status. If found to be no longer in the executing state the
+// process is passed on for checking against the webhook configuration and is no longer tracked in state
 func CheckExecuting(db *sql.DB, st *state.State) error {
 	if len(st.ExecutingProcesses) == 0 {
 		// nothing to do
@@ -88,6 +92,7 @@ func CheckExecuting(db *sql.DB, st *state.State) error {
 	return nil
 }
 
+// just a helper to reduce the duplication
 func easyScan(process *internal.Process, rows *sql.Rows) error {
 	err := rows.Scan(
 		&process.Id,
