@@ -22,6 +22,7 @@ type Hook struct {
 	URL         string  `yaml:"url"`
 	Method      string  `yaml:"method"`
 	Token       string  `yaml:"token"`
+	RequestBody string  `yaml:"requestBody"`
 	Triggers    Trigger `yaml:"triggers"`
 }
 
