@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/spoonboy-io/koan"
 
@@ -13,13 +14,19 @@ import (
 
 func fireWebhook(ctx context.Context, process *internal.Process, hook *Hook, logger *koan.Logger) error {
 	var data io.Reader
+	var err error
 
 	// we WILL parse the hook config
-	// we WILL build HTTP the client
-	// we WILL parse the requestBody param as a template and inject internal.Process params where needed
-	// we WILL get the parsed requestBody
 
-	// form the request, make it, return any errors
+	// parse RequestBody if required
+	if hook.Method != "GET" && hook.RequestBody != "" {
+		data, err = parseRequestBody(process, hook.RequestBody)
+		if err != nil {
+			return err
+		}
+	}
+
+	// form the request, make and return any errors
 	req, err := http.NewRequest(hook.Method, hook.URL, data)
 	if err != nil {
 		return err
@@ -36,4 +43,9 @@ func fireWebhook(ctx context.Context, process *internal.Process, hook *Hook, log
 	}
 
 	return nil
+}
+
+func parseRequestBody(process *internal.Process, body string) (io.Reader, error) {
+
+	return strings.NewReader(""), nil
 }
