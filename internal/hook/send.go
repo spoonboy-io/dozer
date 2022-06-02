@@ -2,41 +2,39 @@ package hook
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"io"
+	"net/http"
 
 	"github.com/spoonboy-io/koan"
 
 	"github.com/spoonboy-io/dozer/internal"
 )
 
-/*
-
-cx, cancel := context.WithCancel(context.Background())
-    req, _ := http.NewRequest("GET", "http://google.com", nil)
-    req = req.WithContext(cx)
-    ch := make(chan error)
-
-    go func() {
-        _, err := http.DefaultClient.Do(req)
-        select {
-        case <-cx.Done():
-            // Already timedout
-        default:
-            ch <- err
-        }
-    }()
-*/
-
 func fireWebhook(process *internal.Process, hook *Hook, logger *koan.Logger, ctx context.Context) error {
+	var data io.Reader
 
 	// we WILL parse the hook config
 	// we WILL build HTTP the client
 	// we WILL parse the requestBody param as a template and inject internal.Process params where needed
 	// we WILL get the parsed requestBody
-	// we WILL form a HTTP request and pass it to the client
-	// we will send it and return for caller to log errors
 
-	fmt.Println("fireWebhook")
+	// form the request, make it, return any errors
+	req, err := http.NewRequest(hook.Method, hook.URL, data)
+	if err != nil {
+		return err
+	}
+	req = req.WithContext(ctx)
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return errors.New(fmt.Sprintf("Bad response (%d): Hook: %s, URL: %s", res.StatusCode, hook.Description, hook.URL))
+	}
 
 	return nil
 }

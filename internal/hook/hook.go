@@ -106,7 +106,7 @@ func ValidateConfig() error {
 // helpers
 func isGoodMethod(method string) error {
 	switch method {
-	case "GET", "POST", "PUT":
+	case "GET", "POST":
 		return nil
 	default:
 		return ERR_BAD_METHOD
