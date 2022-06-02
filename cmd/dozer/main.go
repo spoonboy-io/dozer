@@ -33,6 +33,7 @@ var (
 
 var logger *koan.Logger
 var st *state.State
+var firstRun bool
 
 func init() {
 	st = &state.State{}
@@ -51,12 +52,9 @@ func init() {
 			logger.FatalError("Failed to read or parse saved application state", err)
 		}
 	} else {
-		// first run, and we probably don't want to iterate through previous processes
-		// so we capture latest process, start the poll from there. On subsequent application
-		// launches we will use the state file, if it is gone, we will be back here, and some
-		// webhooks will not have been fired
-
-		// TODO
+		// no state to read, so we need to prevent app running on all processes
+		logger.Warn("No state detected, we will capture last process id")
+		firstRun = true
 	}
 
 	logger.Info("Loading webhook configuration file")
@@ -124,6 +122,14 @@ func main() {
 	processTypes := map[string]string{}
 	if err := morpheus.GetProcessTypes(db, processTypes); err != nil {
 		logger.FatalError("Failed to load process types", err)
+	}
+
+	if firstRun {
+		// first run so we'll set the lastProcessId of state
+		if err := morpheus.GetLastProcessIdOnStart(db, st); err != nil {
+			logger.FatalError("Failed to get last process id", err)
+		}
+		firstRun = false
 	}
 
 	go func() {

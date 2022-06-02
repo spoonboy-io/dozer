@@ -21,7 +21,6 @@ func Test_fireWebhook(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		rw.Write([]byte(`ok`))
 	}))
-	defer server.Close()
 	hook.URL = server.URL
 	hook.Description = "test hook"
 

@@ -3,9 +3,9 @@ package hook
 import (
 	"context"
 	"fmt"
+	"html/template"
 	"io"
 	"net/http"
-	"strings"
 
 	"github.com/spoonboy-io/koan"
 
@@ -47,5 +47,16 @@ func fireWebhook(ctx context.Context, process *internal.Process, hook *Hook, log
 
 func parseRequestBody(process *internal.Process, body string) (io.Reader, error) {
 
-	return strings.NewReader(""), nil
+	fmt.Println("before: ", body)
+
+	var parsed io.ReadWriter
+	t := template.Must(template.New("body").Parse(body))
+	_ = t
+	/*if err := t.Execute(parsed, process); err != nil {
+		return nil, err
+	}*/
+
+	fmt.Println("after: ", parsed)
+
+	return parsed, nil
 }
