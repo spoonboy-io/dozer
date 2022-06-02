@@ -1,14 +1,18 @@
 package hook
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/spoonboy-io/dozer/internal"
+	"github.com/spoonboy-io/koan"
 )
+
+// TODO we need he logger
 
 // CheckProcess will check a process against the configuration to determine if
 // it is an event that should trigger a call webhook
-func CheckProcess(process *internal.Process) {
+func CheckProcess(process *internal.Process, logger *koan.Logger, ctx context.Context) {
 	// go through all the hook config
 	for i := range config {
 		// config uses code we need to search on name, we swap the code for the name in the config
@@ -18,27 +22,47 @@ func CheckProcess(process *internal.Process) {
 		}
 
 		if fire := checkStatus(process, &config[i].Hook); fire {
-			fmt.Println("firing on status", process.Id, process.Status)
+			if err := fireWebhook(process, &config[i].Hook, logger, ctx); err != nil {
+				warnMsg := fmt.Sprintf("Failed to fire webhook on status (hook: '%s', url: '%s', process id: '%d')",
+					config[i].Hook.Description, config[i].Hook.URL, process.Id)
+				logger.Warn(warnMsg)
+			}
 			continue
 		}
 
 		if fire := checkProcessType(process, &config[i].Hook); fire {
-			fmt.Println("firing on process type", process.Id, process.ProcessTypeName.String)
+			if err := fireWebhook(process, &config[i].Hook, logger, ctx); err != nil {
+				warnMsg := fmt.Sprintf("Failed to fire webhook on procesType (hook: '%s', url: '%s', process id: '%d')",
+					config[i].Hook.Description, config[i].Hook.URL, process.Id)
+				logger.Warn(warnMsg)
+			}
 			continue
 		}
 
 		if fire := checkTaskName(process, &config[i].Hook); fire {
-			fmt.Println("firing on task name", process.Id, process.TaskName.String)
+			if err := fireWebhook(process, &config[i].Hook, logger, ctx); err != nil {
+				warnMsg := fmt.Sprintf("Failed to fire webhook on taskName (hook: '%s', url: '%s', process id: '%d')",
+					config[i].Hook.Description, config[i].Hook.URL, process.Id)
+				logger.Warn(warnMsg)
+			}
 			continue
 		}
 
 		if fire := checkAccountId(process, &config[i].Hook); fire {
-			fmt.Println("firing on account id", process.Id, process.AccountId.Int64)
+			if err := fireWebhook(process, &config[i].Hook, logger, ctx); err != nil {
+				warnMsg := fmt.Sprintf("Failed to fire webhook on accountId (hook: '%s', url: '%s', process id: '%d')",
+					config[i].Hook.Description, config[i].Hook.URL, process.Id)
+				logger.Warn(warnMsg)
+			}
 			continue
 		}
 
 		if fire := checkCreatedBy(process, &config[i].Hook); fire {
-			fmt.Println("firing on created by", process.Id, process.CreatedBy.String)
+			if err := fireWebhook(process, &config[i].Hook, logger, ctx); err != nil {
+				warnMsg := fmt.Sprintf("Failed to fire webhook on createdBy (hook: '%s', url: '%s', process id: '%d')",
+					config[i].Hook.Description, config[i].Hook.URL, process.Id)
+				logger.Warn(warnMsg)
+			}
 			continue
 		}
 	}

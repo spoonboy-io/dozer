@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"os"
@@ -67,10 +68,16 @@ func init() {
 
 // Shutdown runs on SIGINT and panic, we save the database poll state
 // which will be loaded upon application restart
-func Shutdown(db *sql.DB) {
+func Shutdown(db *sql.DB, cancel context.CancelFunc) {
 	fmt.Println("") // break after ^C
-	logger.Warn("Application terminated. Closing database connection")
+	logger.Warn("Application terminated")
+	logger.Info("Closing database connection")
 	db.Close()
+
+	// cancel the context so we can stop our http client and in progress http requests
+	logger.Info("Cancelling HTTP client requests")
+	cancel()
+
 	logger.Info("Saving application state")
 	if err := st.CreateAndWrite(); err != nil {
 		logger.Error("Failed to save application state", err)
@@ -78,6 +85,9 @@ func Shutdown(db *sql.DB) {
 }
 
 func main() {
+
+	ctx, cancel := context.WithCancel(context.Background())
+
 	// write a console banner
 	reprise.WriteSimple(&reprise.Banner{
 		Name:         "Dozer",
@@ -99,7 +109,7 @@ func main() {
 		logger.FatalError("Failed to create database connection", err)
 	}
 
-	defer Shutdown(db)
+	defer Shutdown(db, cancel)
 
 	if err = db.Ping(); err != nil {
 		logger.FatalError("Failed to connect to database", err)
@@ -126,11 +136,11 @@ func main() {
 			fmt.Printf("lastProcessId: %d\n", st.LastPollProcessId)
 			fmt.Printf("ExecutingProcesses: %v\n", st.ExecutingProcesses)
 
-			if err = morpheus.CheckExecuting(db, st); err != nil {
+			if err = morpheus.CheckExecuting(db, st, logger, ctx); err != nil {
 				logger.Error("Error handling executing processes", err)
 			}
 
-			if err := morpheus.GetProcesses(db, st); err != nil {
+			if err := morpheus.GetProcesses(db, st, logger, ctx); err != nil {
 				logger.Error("Database poll error", err)
 			}
 

@@ -1,9 +1,12 @@
 package morpheus_test
 
 import (
+	"context"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/spoonboy-io/koan"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/spoonboy-io/dozer/internal/morpheus"
@@ -11,6 +14,10 @@ import (
 )
 
 func TestGetProcesses(t *testing.T) {
+
+	logger := &koan.Logger{}
+	ctx := context.Background()
+
 	// test expectations
 	wantSt := &state.State{
 		LastPollProcessId:  4,
@@ -58,7 +65,7 @@ func TestGetProcesses(t *testing.T) {
 
 	mock.ExpectQuery("^SELECT (.+) FROM process where id > (.+)*").WillReturnRows(rows)
 
-	if err := morpheus.GetProcesses(db, gotSt); err != nil {
+	if err := morpheus.GetProcesses(db, gotSt, logger, ctx); err != nil {
 		t.Fatalf("Unexpected error %v", err)
 	}
 
@@ -79,6 +86,10 @@ func TestGetProcesses(t *testing.T) {
 }
 
 func TestCheckExecuting(t *testing.T) {
+
+	logger := &koan.Logger{}
+	ctx := context.Background()
+
 	// test expectations
 	wantSt := &state.State{
 		LastPollProcessId:  4,
@@ -119,7 +130,7 @@ func TestCheckExecuting(t *testing.T) {
 
 	mock.ExpectQuery("^SELECT (.+) FROM process where id in \\((.+)\\)*").WillReturnRows(rows)
 
-	if err := morpheus.CheckExecuting(db, gotSt); err != nil {
+	if err := morpheus.CheckExecuting(db, gotSt, logger, ctx); err != nil {
 		t.Fatalf("Unexpected error %v", err)
 	}
 

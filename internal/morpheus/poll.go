@@ -1,11 +1,14 @@
 package morpheus
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/spoonboy-io/koan"
 
 	"github.com/spoonboy-io/dozer/internal/hook"
 
@@ -20,7 +23,7 @@ const (
 // GetProcesses polls the database for processes higher than the store latestProcessId
 // if the process is found to be executing it will be tracked, otherwise it is passed on for
 // checking against the webhook configuration
-func GetProcesses(db *sql.DB, st *state.State) error {
+func GetProcesses(db *sql.DB, st *state.State, logger *koan.Logger, ctx context.Context) error {
 	rows, err := db.Query("SELECT * FROM process where id > ?;", st.LastPollProcessId)
 	if err != nil {
 		return err
@@ -39,8 +42,7 @@ func GetProcesses(db *sql.DB, st *state.State) error {
 			st.ExecutingProcesses = append(st.ExecutingProcesses, process.Id)
 		} else {
 			// status is complete or failed so compare row to hook configuration
-			// TODO potentially we should use goroutine so we don't block
-			hook.CheckProcess(&process)
+			go hook.CheckProcess(&process, logger, ctx)
 		}
 		lastProcessId = process.Id
 	}
@@ -57,7 +59,7 @@ func GetProcesses(db *sql.DB, st *state.State) error {
 // CheckExecuting uses state to obtain processes being tracked as 'executing', it performs
 // an SQL query which checks their status. If found to be no longer in the executing state the
 // process is passed on for checking against the webhook configuration and is no longer tracked in state
-func CheckExecuting(db *sql.DB, st *state.State) error {
+func CheckExecuting(db *sql.DB, st *state.State, logger *koan.Logger, ctx context.Context) error {
 	if len(st.ExecutingProcesses) == 0 {
 		// nothing to do
 		return nil
@@ -83,7 +85,7 @@ func CheckExecuting(db *sql.DB, st *state.State) error {
 		}
 		if process.Status != EXECUTING {
 			// status is complete or failed so compare row to hook configuration
-			hook.CheckProcess(&process)
+			go hook.CheckProcess(&process, logger, ctx)
 			// delete from state
 			st.DeleteProcessFromState(process.Id)
 		}
