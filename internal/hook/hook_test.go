@@ -80,3 +80,156 @@ func TestReadAndParseConfig(t *testing.T) {
 	// clean up
 	removeTestYamlFile(t)
 }
+
+func TestValidateConfig(t *testing.T) {
+	testCases := []struct {
+		name    string
+		config  Hooks
+		wantErr error
+	}{
+		{
+			name: "all good, should pass",
+			config: Hooks{
+				{
+					Hook{
+						Description: "test hook 1",
+						URL:         "https://testurl.com",
+						Method:      "GET",
+						Token:       "faketoken1",
+						Triggers: Trigger{
+							Status: "complete",
+						},
+					},
+				},
+			},
+			wantErr: nil,
+		},
+		{
+			name: "bad method, should fail",
+			config: Hooks{
+				{
+					Hook{
+						Description: "test hook 1",
+						URL:         "https://testurl.com",
+						Method:      "BAD_GET",
+						Token:       "faketoken1",
+						Triggers: Trigger{
+							Status: "complete",
+						},
+					},
+				},
+			},
+			wantErr: ERR_BAD_METHOD,
+		},
+		{
+			name: "no description, should fail",
+			config: Hooks{
+				{
+					Hook{
+						Description: "",
+						URL:         "https://testurl.com",
+						Method:      "GET",
+						Token:       "faketoken1",
+						Triggers: Trigger{
+							Status: "complete",
+						},
+					},
+				},
+			},
+			wantErr: ERR_NO_DESCRIPTION,
+		},
+		{
+			name: "bad url, should fail",
+			config: Hooks{
+				{
+					Hook{
+						Description: "test hook",
+						URL:         "https//testurl.com",
+						Method:      "GET",
+						Token:       "faketoken1",
+						Triggers: Trigger{
+							Status: "complete",
+						},
+					},
+				},
+			},
+			wantErr: ERR_BAD_URL,
+		},
+		{
+			name: "no request body on POST, should fail",
+			config: Hooks{
+				{
+					Hook{
+						Description: "test hook",
+						URL:         "https://testurl.com",
+						Method:      "POST",
+						Token:       "faketoken1",
+						Triggers: Trigger{
+							Status: "complete",
+						},
+					},
+				},
+			},
+			wantErr: ERR_NO_BODY,
+		},
+		{
+			name: "no triggers are included, should fail",
+			config: Hooks{
+				{
+					Hook{
+						Description: "test hook",
+						URL:         "https://testurl.com",
+						Method:      "GET",
+						Token:       "faketoken1",
+					},
+				},
+			},
+			wantErr: ERR_NO_TRIGGER,
+		},
+		{
+			name: "status trigger is `executing` should fail",
+			config: Hooks{
+				{
+					Hook{
+						Description: "test hook",
+						URL:         "https://testurl.com",
+						Method:      "GET",
+						Token:       "faketoken1",
+						Triggers: Trigger{
+							Status: "executing",
+						},
+					},
+				},
+			},
+			wantErr: ERR_NO_EXECUTING_STATUS_TRIGGER,
+		},
+		{
+			name: "status trigger invalid/mispelt should fail",
+			config: Hooks{
+				{
+					Hook{
+						Description: "test hook",
+						URL:         "https://testurl.com",
+						Method:      "GET",
+						Token:       "faketoken1",
+						Triggers: Trigger{
+							Status: "badcomplete",
+						},
+					},
+				},
+			},
+			wantErr: ERR_BAD_STATUS_TRIGGER,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// set the package config
+			config = tc.config
+			gotErr := ValidateConfig()
+			if gotErr != tc.wantErr {
+				t.Errorf("wanted %v got %v", tc.wantErr, gotErr)
+			}
+		})
+	}
+}

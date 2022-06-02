@@ -1,8 +1,10 @@
 package hook
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
+	"net/url"
 
 	"github.com/spoonboy-io/dozer/internal"
 
@@ -36,6 +38,18 @@ type Trigger struct {
 	CreatedBy   string `yaml:"createdBy"`
 }
 
+// adding some standard errors we can check in the tests
+// specifically for validating the config
+var (
+	ERR_NO_DESCRIPTION              = errors.New("No description is set")
+	ERR_BAD_METHOD                  = errors.New("method is not acceptable")
+	ERR_BAD_URL                     = errors.New("url is appears to be invalid")
+	ERR_NO_BODY                     = errors.New("method requires requestBody")
+	ERR_NO_TRIGGER                  = errors.New("No triggers defined in the hook")
+	ERR_BAD_STATUS_TRIGGER          = errors.New("Trigger set on status is not recognised")
+	ERR_NO_EXECUTING_STATUS_TRIGGER = errors.New("Can not trigger on status 'executing'")
+)
+
 // ReadAndParseConfig reads the contents of the YAML hook config filer
 // and parses it to a map of Hook structs
 func ReadAndParseConfig(cfgFile string) error {
@@ -47,6 +61,7 @@ func ReadAndParseConfig(cfgFile string) error {
 	if err := yaml.Unmarshal(yamlConfig, &config); err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -59,4 +74,68 @@ func getProcessTypeName(code string) (string, error) {
 		return internal.ProcessTypes[code], nil
 	}
 	return "", nil
+}
+
+func ValidateConfig() error {
+	for i := range config {
+		// check description
+		if config[i].Description == "" {
+			return ERR_NO_DESCRIPTION
+		}
+		// check method
+		if err := isGoodMethod(config[i].Method); err != nil {
+			return err
+		}
+		// check url
+		if _, err := url.ParseRequestURI(config[i].URL); err != nil {
+			return ERR_BAD_URL
+		}
+		// if method POST/PUT check request body is present
+		if err := shouldHaveRequestBody(config[i].Method, config[i].RequestBody); err != nil {
+			return err
+		}
+		// check at least one trigger
+		if err := checkTriggers(config[i].Triggers); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// helpers
+func isGoodMethod(method string) error {
+	switch method {
+	case "GET", "POST", "PUT":
+		return nil
+	default:
+		return ERR_BAD_METHOD
+	}
+}
+
+func shouldHaveRequestBody(method, requestBody string) error {
+	if method != "GET" {
+		if requestBody == "" {
+			return ERR_NO_BODY
+		}
+	}
+	return nil
+}
+
+func checkTriggers(trigger Trigger) error {
+	if trigger.TaskName == "" && trigger.Status == "" && trigger.ProcessType == "" && trigger.CreatedBy == "" && trigger.AccountId == 0 {
+		return ERR_NO_TRIGGER
+	}
+
+	if trigger.Status == "executing" {
+		return ERR_NO_EXECUTING_STATUS_TRIGGER
+	}
+
+	switch trigger.Status {
+	case "complete", "failed", "":
+		return nil
+	default:
+		fmt.Println(trigger.Status)
+		return ERR_BAD_STATUS_TRIGGER
+	}
 }

@@ -64,6 +64,10 @@ func init() {
 	if err != nil {
 		logger.FatalError("Failed to read webhook configuration file", err)
 	}
+	err = hook.ValidateConfig()
+	if err != nil {
+		logger.FatalError("Failed to validate webhook configuration", err)
+	}
 }
 
 // Shutdown runs on SIGINT and panic, we save the database poll state
