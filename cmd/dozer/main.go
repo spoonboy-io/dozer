@@ -45,19 +45,6 @@ func init() {
 		logger.FatalError("Failed to read database config file", err)
 	}
 
-	// check for state, if exists load it
-	if st.HasSavedState() {
-		logger.Info("Loading saved state")
-		if err = st.ReadAndParse(); err != nil {
-			logger.FatalError("Failed to read or parse saved application state", err)
-		}
-	} else {
-		// no state to read, so we need to prevent app running on all processes
-		logger.Warn("No state detected, we will capture last process id")
-		firstRun = true
-	}
-
-	logger.Info("Loading webhook configuration file")
 	err = hook.ReadAndParseConfig(HOOK_CONFIG)
 	if err != nil {
 		logger.FatalError("Failed to read webhook configuration file", err)
@@ -102,6 +89,17 @@ func main() {
 		EmailAddress: "hello@spoonboy.io",
 	})
 
+	// check for state, if exists load it
+	if st.HasSavedState() {
+		logger.Info("Loading saved state")
+		if err := st.ReadAndParse(); err != nil {
+			logger.FatalError("Failed to read or parse saved application state", err)
+		}
+	} else {
+		// no state to read, so we need to prevent app running on all processes
+		firstRun = true
+	}
+
 	// connect to database
 	var db *sql.DB
 	var err error
@@ -126,6 +124,7 @@ func main() {
 
 	if firstRun {
 		// first run so we'll set the lastProcessId of state
+		logger.Warn("No state detected, capturing last process id")
 		if err := morpheus.GetLastProcessIdOnStart(db, st); err != nil {
 			logger.FatalError("Failed to get last process id", err)
 		}
