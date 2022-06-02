@@ -140,11 +140,11 @@ func main() {
 			fmt.Printf("lastProcessId: %d\n", st.LastPollProcessId)
 			fmt.Printf("ExecutingProcesses: %v\n", st.ExecutingProcesses)
 
-			if err = morpheus.CheckExecuting(db, st, logger, ctx); err != nil {
+			if err = morpheus.CheckExecuting(ctx, db, st, logger); err != nil {
 				logger.Error("Error handling executing processes", err)
 			}
 
-			if err := morpheus.GetProcesses(db, st, logger, ctx); err != nil {
+			if err := morpheus.GetProcesses(ctx, db, st, logger); err != nil {
 				logger.Error("Database poll error", err)
 			}
 

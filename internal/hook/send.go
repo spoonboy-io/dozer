@@ -2,7 +2,6 @@ package hook
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -12,7 +11,7 @@ import (
 	"github.com/spoonboy-io/dozer/internal"
 )
 
-func fireWebhook(process *internal.Process, hook *Hook, logger *koan.Logger, ctx context.Context) error {
+func fireWebhook(ctx context.Context, process *internal.Process, hook *Hook, logger *koan.Logger) error {
 	var data io.Reader
 
 	// we WILL parse the hook config
@@ -33,7 +32,7 @@ func fireWebhook(process *internal.Process, hook *Hook, logger *koan.Logger, ctx
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return errors.New(fmt.Sprintf("Bad response (%d): Hook: %s, URL: %s", res.StatusCode, hook.Description, hook.URL))
+		return fmt.Errorf("Bad response (%d): Hook: %s, URL: %s", res.StatusCode, hook.Description, hook.URL)
 	}
 
 	return nil

@@ -65,7 +65,7 @@ func TestGetProcesses(t *testing.T) {
 
 	mock.ExpectQuery("^SELECT (.+) FROM process where id > (.+)*").WillReturnRows(rows)
 
-	if err := morpheus.GetProcesses(db, gotSt, logger, ctx); err != nil {
+	if err := morpheus.GetProcesses(ctx, db, gotSt, logger); err != nil {
 		t.Fatalf("Unexpected error %v", err)
 	}
 
@@ -130,7 +130,7 @@ func TestCheckExecuting(t *testing.T) {
 
 	mock.ExpectQuery("^SELECT (.+) FROM process where id in \\((.+)\\)*").WillReturnRows(rows)
 
-	if err := morpheus.CheckExecuting(db, gotSt, logger, ctx); err != nil {
+	if err := morpheus.CheckExecuting(ctx, db, gotSt, logger); err != nil {
 		t.Fatalf("Unexpected error %v", err)
 	}
 

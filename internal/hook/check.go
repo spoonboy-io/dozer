@@ -8,11 +8,9 @@ import (
 	"github.com/spoonboy-io/koan"
 )
 
-// TODO we need he logger
-
 // CheckProcess will check a process against the configuration to determine if
 // it is an event that should trigger a call webhook
-func CheckProcess(process *internal.Process, logger *koan.Logger, ctx context.Context) {
+func CheckProcess(ctx context.Context, process *internal.Process, logger *koan.Logger) {
 	// go through all the hook config
 	for i := range config {
 		// config uses code we need to search on name, we swap the code for the name in the config
@@ -22,7 +20,7 @@ func CheckProcess(process *internal.Process, logger *koan.Logger, ctx context.Co
 		}
 
 		if fire := checkStatus(process, &config[i].Hook); fire {
-			if err := fireWebhook(process, &config[i].Hook, logger, ctx); err != nil {
+			if err := fireWebhook(ctx, process, &config[i].Hook, logger); err != nil {
 				warnMsg := fmt.Sprintf("Failed to fire webhook on status (hook: '%s', url: '%s', process id: '%d') error: %v",
 					config[i].Hook.Description, config[i].Hook.URL, process.Id, err)
 				logger.Warn(warnMsg)
@@ -31,7 +29,7 @@ func CheckProcess(process *internal.Process, logger *koan.Logger, ctx context.Co
 		}
 
 		if fire := checkProcessType(process, &config[i].Hook); fire {
-			if err := fireWebhook(process, &config[i].Hook, logger, ctx); err != nil {
+			if err := fireWebhook(ctx, process, &config[i].Hook, logger); err != nil {
 				warnMsg := fmt.Sprintf("Failed to fire webhook on procesType (hook: '%s', url: '%s', process id: '%d') error: %v",
 					config[i].Hook.Description, config[i].Hook.URL, process.Id, err)
 				logger.Warn(warnMsg)
@@ -40,7 +38,7 @@ func CheckProcess(process *internal.Process, logger *koan.Logger, ctx context.Co
 		}
 
 		if fire := checkTaskName(process, &config[i].Hook); fire {
-			if err := fireWebhook(process, &config[i].Hook, logger, ctx); err != nil {
+			if err := fireWebhook(ctx, process, &config[i].Hook, logger); err != nil {
 				warnMsg := fmt.Sprintf("Failed to fire webhook on taskName (hook: '%s', url: '%s', process id: '%d') error: %v",
 					config[i].Hook.Description, config[i].Hook.URL, process.Id, err)
 				logger.Warn(warnMsg)
@@ -49,7 +47,7 @@ func CheckProcess(process *internal.Process, logger *koan.Logger, ctx context.Co
 		}
 
 		if fire := checkAccountId(process, &config[i].Hook); fire {
-			if err := fireWebhook(process, &config[i].Hook, logger, ctx); err != nil {
+			if err := fireWebhook(ctx, process, &config[i].Hook, logger); err != nil {
 				warnMsg := fmt.Sprintf("Failed to fire webhook on accountId (hook: '%s', url: '%s', process id: '%d') error: %v",
 					config[i].Hook.Description, config[i].Hook.URL, process.Id, err)
 				logger.Warn(warnMsg)
@@ -58,7 +56,7 @@ func CheckProcess(process *internal.Process, logger *koan.Logger, ctx context.Co
 		}
 
 		if fire := checkCreatedBy(process, &config[i].Hook); fire {
-			if err := fireWebhook(process, &config[i].Hook, logger, ctx); err != nil {
+			if err := fireWebhook(ctx, process, &config[i].Hook, logger); err != nil {
 				warnMsg := fmt.Sprintf("Failed to fire webhook on createdBy (hook: '%s', url: '%s', process id: '%d') error: %v",
 					config[i].Hook.Description, config[i].Hook.URL, process.Id, err)
 				logger.Warn(warnMsg)

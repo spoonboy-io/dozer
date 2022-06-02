@@ -25,7 +25,7 @@ func Test_fireWebhook(t *testing.T) {
 	hook.URL = server.URL
 	hook.Description = "test hook"
 
-	if err := fireWebhook(process, hook, logger, ctx); err != nil {
+	if err := fireWebhook(ctx, process, hook, logger); err != nil {
 		t.Errorf("fail %v", err)
 	}
 	server.Close()
@@ -37,7 +37,7 @@ func Test_fireWebhook(t *testing.T) {
 	hook.URL = server2.URL
 	hook.Description = "test hook - bad should be 404 and error"
 
-	if err := fireWebhook(process, hook, logger, ctx); err == nil {
+	if err := fireWebhook(ctx, process, hook, logger); err == nil {
 		t.Errorf("fail expected an error because the server did not return 200")
 	}
 	server2.Close()
