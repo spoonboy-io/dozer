@@ -116,7 +116,7 @@ func parseRequestBody(process *internal.Process, body string) (io.Reader, error)
 	safeProcess := safeProcess{
 		Id:        process.Id,
 		SubType:   process.SubType.String,
-		UpdatedBy: process.UpdatedBy.String,
+		UpdatedBy: process.UpdatedById.Int64,
 	}
 	fmt.Println("before: ", body)
 
