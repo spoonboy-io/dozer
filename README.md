@@ -1,5 +1,7 @@
 # Dozer
 
+## Morpheus Processes with Webhooks
+
 [![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/spoonboy-io/dozer?style=flat-square)](https://go.dev/)
 [![Go Report Card](https://goreportcard.com/badge/github.com/spoonboy-io/dozer?style=flat-square)](https://goreportcard.com/report/github.com/spoonboy-io/dozer)
 [![DeepSource](https://deepsource.io/gh/spoonboy-io/dozer.svg/?label=active+issues&token=uYY_4Kwjq9MnjT7TzykEyv-J)](https://deepsource.io/gh/spoonboy-io/dozer/?ref=repository-badge)
@@ -9,6 +11,13 @@
 [![GitHub Release Date](https://img.shields.io/github/release-date/spoonboy-io/dozer?style=flat-square)](https://github.com/spoonboy-io/dozer/releases)
 [![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/spoonboy-io/dozer/latest?style=flat-square)](https://github.com/spoonboy-io/dozer/commits)
 [![GitHub](https://img.shields.io/github/license/spoonboy-io/dozer?label=license&style=flat-square)](LICENSE)
+
+## About
+
+Dozer watches [Morpheus CMP](https://morpheusdata.com) processes/events. 
+It will notify external applications of Morpheus events
+via HTTP request (webhook) based on YAML configuration you specify.
+
 
 
 ### License
