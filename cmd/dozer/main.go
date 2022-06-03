@@ -33,7 +33,6 @@ var (
 
 var logger *koan.Logger
 var st *state.State
-var firstRun bool
 
 func init() {
 	st = &state.State{}
@@ -74,7 +73,7 @@ func Shutdown(db *sql.DB, cancel context.CancelFunc) {
 }
 
 func main() {
-
+	var firstRun bool
 	ctx, cancel := context.WithCancel(context.Background())
 
 	// write a console banner
@@ -141,10 +140,6 @@ func main() {
 		}
 		pollInterval := time.NewTicker(time.Duration(pollSecs) * time.Second)
 		for range pollInterval.C {
-			/* temp monitor */
-			fmt.Printf("lastProcessId: %d\n", st.LastPollProcessId)
-			fmt.Printf("ExecutingProcesses: %v\n", st.ExecutingProcesses)
-
 			if err = morpheus.CheckExecuting(ctx, db, st, logger); err != nil {
 				logger.Error("Error handling executing processes", err)
 			}
@@ -153,7 +148,8 @@ func main() {
 				logger.Error("Database poll error", err)
 			}
 
-			lastPollMsg := fmt.Sprintf("Last datasbase poll performed at %s", st.LastPollTimestamp)
+			lastPollMsg := fmt.Sprintf("Last datasbase poll performed at %s (lastProcessId: %d, tracking executing; %d)",
+				st.LastPollTimestamp, st.LastPollProcessId, len(st.ExecutingProcesses))
 			logger.Info(lastPollMsg)
 		}
 	}()
