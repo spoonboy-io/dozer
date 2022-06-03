@@ -24,8 +24,8 @@ const (
 // if the process is found to be executing it will be tracked, otherwise it is passed on for
 // checking against the webhook configuration
 func GetProcesses(ctx context.Context, db *sql.DB, st *state.State, logger *koan.Logger) error {
-	rows, err := db.Query("SELECT * FROM process where id > ?;", st.LastPollProcessId)
-	// rows, err := db.Query("SELECT * FROM process;") // for testingh
+	//rows, err := db.Query("SELECT * FROM process where id > ?;", st.LastPollProcessId)
+	rows, err := db.Query("SELECT * FROM process where id = 107;") // for testing TODO remove
 	if err != nil {
 		return err
 	}
