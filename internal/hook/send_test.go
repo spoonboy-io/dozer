@@ -40,6 +40,26 @@ func Test_fireWebhook(t *testing.T) {
 		t.Errorf("fail expected an error because the server did not return 200")
 	}
 	server2.Close()
+
+	// test token is correctly sent & set
+	wantToken := "BEARER AB123XXXXXXXXXZZZ"
+	gotToken := ""
+	server3 := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		gotToken = req.Header.Get("Authorization")
+		rw.Write([]byte(`ok`))
+	}))
+	hook.URL = server3.URL
+	hook.Description = "test hook - bad should be 404 and error"
+	hook.Token = wantToken
+
+	if err := fireWebhook(ctx, process, hook, logger); err != nil {
+		t.Errorf("fail %v", err)
+	}
+
+	if gotToken != wantToken {
+		t.Errorf("fail wanted %v, got %v", gotToken, wantToken)
+	}
+	server3.Close()
 }
 
 func Test_processRequestBody(t *testing.T) {

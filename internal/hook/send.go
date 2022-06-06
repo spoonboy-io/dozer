@@ -14,39 +14,6 @@ import (
 	"github.com/spoonboy-io/dozer/internal"
 )
 
-func fireWebhook(ctx context.Context, process *internal.Process, hook *Hook, logger *koan.Logger) error {
-	var data io.Reader
-	var err error
-
-	// we WILL parse the hook config
-
-	// parse RequestBody if required
-	if hook.Method != "GET" && hook.RequestBody != "" {
-		data, err = parseRequestBody(process, hook.RequestBody)
-		if err != nil {
-			return err
-		}
-	}
-
-	// form the request, make and return any errors
-	req, err := http.NewRequest(hook.Method, hook.URL, data)
-	if err != nil {
-		return err
-	}
-	req = req.WithContext(ctx)
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return err
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return fmt.Errorf("Bad response (%d): Hook: %s, URL: %s", res.StatusCode, hook.Description, hook.URL)
-	}
-
-	return nil
-}
-
 // safeProcess will collect the properties we want to make available for interpolating into the JSON request body,
 // we make available via this type and not process as the sql null int64, string and bool types are not parseable
 type safeProcess struct {
@@ -110,6 +77,43 @@ type safeProcess struct {
 	EventTitle           string
 }
 
+func fireWebhook(ctx context.Context, process *internal.Process, hook *Hook, logger *koan.Logger) error {
+	var data io.Reader
+	var err error
+
+	// parse RequestBody if required
+	if hook.Method != "GET" && hook.RequestBody != "" {
+		data, err = parseRequestBody(process, hook.RequestBody)
+		if err != nil {
+			return err
+		}
+	}
+
+	// form the request, make and return any errors
+	req, err := http.NewRequest(hook.Method, hook.URL, data)
+	if err != nil {
+		return err
+	}
+	req = req.WithContext(ctx)
+
+	// form the authorization header if exists
+	if hook.Token != "" {
+		req.Header.Add("Authorization", hook.Token)
+	}
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return fmt.Errorf("Bad response (%d): Hook: %s, URL: %s", res.StatusCode, hook.Description, hook.URL)
+	}
+
+	return nil
+}
+
 func parseRequestBody(process *internal.Process, body string) (io.Reader, error) {
 	var buffer bytes.Buffer
 
@@ -117,12 +121,13 @@ func parseRequestBody(process *internal.Process, body string) (io.Reader, error)
 		Id:        process.Id,
 		SubType:   process.SubType.String,
 		UpdatedBy: process.UpdatedById.Int64,
+		// TODO we need to add in the remaining properties
 	}
+
 	fmt.Println("before: ", body)
 
 	t := template.Must(template.New("body").Parse(body))
 	if err := t.Execute(&buffer, safeProcess); err != nil {
-
 		return &buffer, err
 	}
 
