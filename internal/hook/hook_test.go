@@ -228,7 +228,6 @@ func TestValidateConfig(t *testing.T) {
 						Description: "test hook 1",
 						URL:         "http://testurl.com",
 						Method:      "GET",
-						Token:       "faketoken1",
 						Triggers: Trigger{
 							Status: "complete",
 						},

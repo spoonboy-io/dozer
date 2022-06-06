@@ -70,7 +70,7 @@ type Process struct {
 	StartDate            sql.NullTime    `db:"start_date""`
 	ZoneId               sql.NullInt64   `db:"zone_id"`
 	InputFormat          sql.NullString  `db:"input_format"`
-	ServerID             sql.NullInt64   `db:"server_id"`
+	ServerId             sql.NullInt64   `db:"server_id"`
 	ExitCode             sql.NullString  `db:"exit_code"`
 	IntegrationId        sql.NullInt64   `db:"integration_id"`
 	RefId                sql.NullInt64   `db:"ref_id"`
