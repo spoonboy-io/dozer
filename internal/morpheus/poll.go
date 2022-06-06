@@ -168,7 +168,7 @@ func easyScan(process *internal.Process, rows *sql.Rows) error {
 		&process.StartDate,
 		&process.ZoneId,
 		&process.InputFormat,
-		&process.ServerID,
+		&process.ServerId,
 		&process.ExitCode,
 		&process.IntegrationId,
 		&process.RefId,
