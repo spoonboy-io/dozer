@@ -48,6 +48,7 @@ var (
 	ERR_NO_TRIGGER                  = errors.New("No triggers defined in the hook")
 	ERR_BAD_STATUS_TRIGGER          = errors.New("Trigger set on status is not recognised")
 	ERR_NO_EXECUTING_STATUS_TRIGGER = errors.New("Can not trigger on status 'executing'")
+	ERR_NOT_HTTPS                   = errors.New("url is not secure (no HTTPS)")
 )
 
 // ReadAndParseConfig reads the contents of the YAML hook config filer
@@ -87,8 +88,13 @@ func ValidateConfig() error {
 			return err
 		}
 		// check url
-		if _, err := url.ParseRequestURI(config[i].URL); err != nil {
+		if pURL, err := url.ParseRequestURI(config[i].URL); err != nil {
 			return ERR_BAD_URL
+		} else {
+			// check https
+			if pURL.Scheme != "https" {
+				return ERR_NOT_HTTPS
+			}
 		}
 		// if method POST/PUT check request body is present
 		if err := shouldHaveRequestBody(config[i].Method, config[i].RequestBody); err != nil {
