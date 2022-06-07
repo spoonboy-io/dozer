@@ -102,6 +102,8 @@ nohup ./dozer &
 
 - Add more triggers such as `zoneId`, `instanceName`, `appName`, `containerName`
 - Retry and blacklisting for webhooks that fail
+- Other notification mechanisms such as email or messaging protocol
+- Run as a service
 
 ### License
 Licensed under [Mozilla Public License 2.0](LICENSE)
