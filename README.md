@@ -20,7 +20,7 @@ via HTTP request (webhook) based on YAML configuration you specify.
 
 ## Releases
 
-You can find the [latest software here](https://github.com/spoonboy-io/dozer/releases/latest) (soon).
+You can find the [latest software here](https://github.com/spoonboy-io/dozer/releases/latest).
 
 ### Get Started
 
@@ -84,7 +84,7 @@ be satisfied for the Webhook to fire.
 
 
 ### Installation
-Grab the tar.gz or zip archive for your OS from the [releases page](https://github.com/spoonboy-io/dozer/releases/latest) (soon).
+Grab the tar.gz or zip archive for your OS from the [releases page](https://github.com/spoonboy-io/dozer/releases/latest).
 
 Unpack it to the target host, and then start the server.
 
