@@ -36,7 +36,7 @@ MYSQL_SERVER=127.0.0.1
 MYSQL_USER=dozer
 MYSQL_PASSWORD=xxxxa8aca0de5dab5fa1bxxxxx
 
-## Optional to override database poll interval
+## Optional to override default database poll interval (5 seconds)
 POLL_INTERVAL_SECONDS=3
 ```
 
@@ -66,7 +66,7 @@ GET and POST methods are supported. POST method will look for `requestBody`.
 If `token` is supplied it will be sent in the AUTHORIZATION header.
 
 Variables which cotain information about the Morpheus process can be interpolated in the `requestBody` using the standard Golang
-templating format. A complete list can be found here (TODO).
+templating format. A complete list can be found [here](https://github.com/spoonboy-io/dozer/blob/master/internal/hook/send.go#L15).
 
 ### Triggers
 
