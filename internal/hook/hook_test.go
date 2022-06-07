@@ -173,6 +173,24 @@ func TestValidateConfig(t *testing.T) {
 			wantErr: ERR_NO_BODY,
 		},
 		{
+			name: "bad request body variable {{.BadId}}, should fail",
+			config: Hooks{
+				{
+					Hook{
+						Description: "test hook",
+						URL:         "https://testurl.com",
+						Method:      "POST",
+						RequestBody: "{{.BadId}}",
+						Token:       "faketoken1",
+						Triggers: Trigger{
+							Status: "complete",
+						},
+					},
+				},
+			},
+			wantErr: ERR_COULD_NOT_PARSE_BODY,
+		},
+		{
 			name: "no triggers are included, should fail",
 			config: Hooks{
 				{

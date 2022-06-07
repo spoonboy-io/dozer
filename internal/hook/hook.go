@@ -49,6 +49,7 @@ var (
 	ERR_BAD_STATUS_TRIGGER          = errors.New("Trigger set on status is not recognised")
 	ERR_NO_EXECUTING_STATUS_TRIGGER = errors.New("Can not trigger on status 'executing'")
 	ERR_NOT_HTTPS                   = errors.New("url is not secure (no HTTPS)")
+	ERR_COULD_NOT_PARSE_BODY        = errors.New("Problem parsing request body, check included variables")
 )
 
 // ReadAndParseConfig reads the contents of the YAML hook config filer
@@ -83,10 +84,12 @@ func ValidateConfig() error {
 		if config[i].Description == "" {
 			return ERR_NO_DESCRIPTION
 		}
+
 		// check method
 		if err := isGoodMethod(config[i].Method); err != nil {
 			return err
 		}
+
 		// check url
 		if pURL, err := url.ParseRequestURI(config[i].URL); err != nil {
 			return ERR_BAD_URL
@@ -96,10 +99,12 @@ func ValidateConfig() error {
 				return ERR_NOT_HTTPS
 			}
 		}
+
 		// if method POST/PUT check request body is present
 		if err := shouldHaveRequestBody(config[i].Method, config[i].RequestBody); err != nil {
 			return err
 		}
+
 		// check at least one trigger
 		if err := checkTriggers(config[i].Triggers); err != nil {
 			return err
@@ -123,6 +128,13 @@ func shouldHaveRequestBody(method, requestBody string) error {
 	if method != "GET" {
 		if requestBody == "" {
 			return ERR_NO_BODY
+		}
+		// we should parse the body, to check that any included vars are valid
+		// or we'll fail at runtime when the hook is trigger
+
+		_, err := parseRequestBody(&internal.Process{}, requestBody)
+		if err != nil {
+			return ERR_COULD_NOT_PARSE_BODY
 		}
 	}
 	return nil
