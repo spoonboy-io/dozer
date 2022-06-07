@@ -28,7 +28,7 @@ Dozer polls the Morpheus database so needs credentials. The `morpheus` user can 
 create an additional user with SELECT privileges on the `process` and `process_type` tables.
 
 A `mysql.env` file should be created in the same directory as the application from which the database user configuration
-will be read. The following example shows the environment variables used by Dozer:
+will be read. The following example shows the environment variables used by Dozer which should be included in `mysql.env`:
 
 ```bash
 ## MySQL Config
@@ -61,11 +61,11 @@ as the Dozer application. An example configuration, showing a single Webhook is 
     triggers:
       status: complete
 ```
-GET and POST methods are supported. POST method will look for `requestBody`.
+GET and POST methods are supported. If POST method Dozer will look for `requestBody`.
 
 If `token` is supplied it will be sent in the AUTHORIZATION header.
 
-Variables which cotain information about the Morpheus process can be interpolated in the `requestBody` using the standard Golang
+Variables which contain information about the Morpheus process can be interpolated in the `requestBody` using the standard Golang
 templating format. A complete list can be found [here](https://github.com/spoonboy-io/dozer/blob/master/internal/hook/send.go#L15).
 
 ### Triggers
@@ -77,7 +77,7 @@ be satisfied for the Webhook to fire.
 | Trigger 	        | Description 	                                            | YAML Example                  |
 |---------	        |-------------	                                            | ---------	                    |
 | `status`          | Runs when the process is complete or failed       	    | `status: failed`              |
-| `processType`     | Runs on for a specific process type ([see list here](https://github.com/spoonboy-io/dozer/blob/master/internal/morpheus/processType.go#L11))       | `processType: localWorkflow`  |
+| `processType`     | Runs for a specific process type ([see list here](https://github.com/spoonboy-io/dozer/blob/master/internal/morpheus/processType.go#L11))       | `processType: localWorkflow`  |
 | `taskName`        | Runs for a given task name            	                | `taskName: Hello World`       |
 | `accountId`       | Runs for specific tenant id           	                | `accountId: 2`        	    |
 | `createdBy`       | Runs for processes created by a specific user            	| `createdBy: admin`        	|
@@ -97,6 +97,11 @@ Or with nohup..
 ```
 nohup ./dozer &
 ```
+
+### Development Opportunities
+
+- Add more triggers such as `zoneId`, `instanceName`, `appName`, `containerName`
+- Retry and blacklisting for webhooks that fail
 
 ### License
 Licensed under [Mozilla Public License 2.0](LICENSE)
