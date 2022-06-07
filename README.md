@@ -18,7 +18,85 @@ Dozer watches [Morpheus CMP](https://morpheusdata.com) processes/events.
 It will notify external applications of Morpheus events
 via HTTP request (webhook) based on YAML configuration you specify.
 
+## Releases
 
+You can find the [latest software here](https://github.com/spoonboy-io/dozer/releases/latest) (soon).
+
+### Get Started
+
+Dozer polls the Morpheus database so needs credentials. The `morpheus` user can be used, but it is preferable to 
+create an additional user with SELECT privileges on the `process` and `process_type` tables.
+
+A `mysql.env` file should be created in the same directory as the application from which the database user configuration
+will be read. The following an example shows the environment variables used by Dozer:
+
+```dotenv
+## MySQL Config
+MYSQL_SERVER=127.0.0.1
+MYSQL_USER=dozer
+MYSQL_PASSWORD=xxxxa8aca0de5dab5fa1bxxxxx
+
+## Optional to override database poll interval
+POLL_INTERVAL_SECONDS=3
+```
+
+### Webhook Configuration
+
+Webhooks and their triggers are configured in a YAML file `webhook.yaml` which should reside in the same directory
+as the Dozer application. An example configuration, showing a single Webhook is shown below:
+
+```YAML
+---
+- webhook:
+    description: Hook example with trigger that runs when status is `complete`
+    url: https://webhook-endpoint.com
+    method: POST
+    requestBody: |
+        {
+            "id": {{.Id}},
+            "updatedBy": "{{.UpdatedBy}}",
+            "status": "{{.Status}}"
+        }
+    token: BEARER xxxxxxxxxxxxxx
+    triggers:
+      status: complete
+```
+GET and POST methods are supported. POST method will look for `requestBody`.
+
+If `token` is supplied it will be sent in the AUTHORIZATION header.
+
+Variables which cotain information about the Morpheus process can be interpolated in the `requestBody` using the standard Golang
+templating format. A complete list can be found here (TODO).
+
+### Triggers
+
+Currently, Webhook triggers can be specified on `status`, `processType`, `taskName`, `accountId` and `createdBy`. They are 
+evaluated on processes which have finished running, not in-progress processes. Triggers are additive - all conditions must 
+be satisfied for the Webhook to fire.
+
+| Trigger 	        | Description 	                                            | YAML Example                  |
+|---------	        |-------------	                                            | ---------	                    |
+| `status`          | Runs when the process is complete or failed       	    | `status: failed`              |
+| `processType`     | Runs on for a specific process type (see list here TODO)       | `processType: localWorkflow`  |
+| `taskName`        | Runs for a given task name            	                | `taskName: Hello World`       |
+| `accountId`       | Runs for specific tenant id           	                | `accountId: 2`        	    |
+| `createdBy`       | Runs for processes created by a specific user            	| `createdBy: admin`        	|
+
+
+### Installation
+Grab the tar.gz or zip archive for your OS from the [releases page](https://github.com/spoonboy-io/dozer/releases/latest) (soon).
+
+Unpack it to the target host, and then start the server.
+
+```
+./dozer
+```
+
+Or with nohup..
+
+```
+nohup ./dozer &
+```
 
 ### License
 Licensed under [Mozilla Public License 2.0](LICENSE)
