@@ -77,7 +77,7 @@ be satisfied for the Webhook to fire.
 | Trigger 	        | Description 	                                            | YAML Example                  |
 |---------	        |-------------	                                            | ---------	                    |
 | `status`          | Runs when the process is complete or failed       	    | `status: failed`              |
-| `processType`     | Runs on for a specific process type (see list here TODO)       | `processType: localWorkflow`  |
+| `processType`     | Runs on for a specific process type ([see list here](https://github.com/spoonboy-io/dozer/blob/master/internal/morpheus/processType.go#L11))       | `processType: localWorkflow`  |
 | `taskName`        | Runs for a given task name            	                | `taskName: Hello World`       |
 | `accountId`       | Runs for specific tenant id           	                | `accountId: 2`        	    |
 | `createdBy`       | Runs for processes created by a specific user            	| `createdBy: admin`        	|
