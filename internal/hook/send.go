@@ -173,14 +173,10 @@ func parseRequestBody(process *internal.Process, body string) (io.Reader, error)
 		EventTitle:           process.EventTitle.String,
 	}
 
-	fmt.Println("before: ", body)
-
 	t := template.Must(template.New("body").Parse(body))
 	if err := t.Execute(&buffer, safeProcess); err != nil {
 		return &buffer, err
 	}
-
-	fmt.Println("after: ", buffer.String())
 
 	return &buffer, nil
 }

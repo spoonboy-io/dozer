@@ -2,8 +2,11 @@ package hook
 
 import (
 	"context"
+	"database/sql"
+	"io"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/spoonboy-io/koan"
@@ -63,5 +66,62 @@ func Test_fireWebhook(t *testing.T) {
 }
 
 func Test_processRequestBody(t *testing.T) {
+	testCases := []struct {
+		name       string
+		process    *internal.Process
+		body       string
+		wantOutput string
+	}{
+		{
+			"testing a random selection of properties are interpolated (1)",
+			&internal.Process{
+				Id:              1,
+				Status:          "complete",
+				ProcessTypeName: sql.NullString{String: "Test Process Name"},
+				TaskName:        sql.NullString{String: "Test Task Name"},
+				CreatedBy:       sql.NullString{String: "Test User"},
+				AccountId:       sql.NullInt64{Int64: 2},
+			},
+			"{{.Id}}, {{.Status}}, {{.ProcessTypeName}}, {{.TaskName}}, {{.CreatedBy}}, {{.AccountId}}",
+			"1, complete, Test Process Name, Test Task Name, Test User, 2",
+		},
+
+		{
+			"testing a random selection of properties are interpolated (2)",
+			&internal.Process{
+				Success:              sql.NullBool{Bool: true},
+				CreatedByDisplayName: sql.NullString{String: "Test User"},
+				DisplayName:          sql.NullString{String: "Test User"},
+				Input:                sql.NullString{String: "Test Input"},
+				AppId:                sql.NullInt64{Int64: 2},
+				Message:              sql.NullString{String: "Test Message"},
+				RefType:              sql.NullString{String: "Test Ref"},
+				JobTemplateId:        sql.NullInt64{Int64: 2},
+				ContainerName:        sql.NullString{String: "Test Container Name"},
+			},
+			"{{.Success}}, {{.CreatedByDisplayName}}, {{.DisplayName}}, {{.Input}}, {{.AppId}}, {{.Message}}, {{.RefType}}, {{.JobTemplateId}}, {{.ContainerName}}",
+			"true, Test User, Test User, Test Input, 2, Test Message, Test Ref, 2, Test Container Name",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// set the package config
+			gotReader, err := parseRequestBody(tc.process, tc.body)
+			if err != nil {
+				t.Fatalf("Unexpected error %v ", err)
+			}
+
+			gotOutput := new(strings.Builder)
+			_, err = io.Copy(gotOutput, gotReader)
+			if err != nil {
+				t.Fatalf("Unexpected error %v ", err)
+			}
+
+			if gotOutput.String() != tc.wantOutput {
+				t.Errorf("Failed\n got: %v\n wanted: %v", gotOutput, tc.wantOutput)
+			}
+		})
+	}
 
 }
