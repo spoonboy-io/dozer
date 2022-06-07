@@ -9,8 +9,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/spoonboy-io/koan"
-
 	"github.com/spoonboy-io/dozer/internal"
 )
 
@@ -78,7 +76,7 @@ type safeProcess struct {
 	EventTitle    string
 }
 
-func fireWebhook(ctx context.Context, process *internal.Process, hook *Hook, logger *koan.Logger) error {
+func fireWebhook(ctx context.Context, process *internal.Process, hook *Hook) error {
 	var data io.Reader
 	var err error
 
