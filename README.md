@@ -28,9 +28,9 @@ Dozer polls the Morpheus database so needs credentials. The `morpheus` user can 
 create an additional user with SELECT privileges on the `process` and `process_type` tables.
 
 A `mysql.env` file should be created in the same directory as the application from which the database user configuration
-will be read. The following an example shows the environment variables used by Dozer:
+will be read. The following example shows the environment variables used by Dozer:
 
-```dotenv
+```bash
 ## MySQL Config
 MYSQL_SERVER=127.0.0.1
 MYSQL_USER=dozer
