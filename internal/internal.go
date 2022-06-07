@@ -58,7 +58,7 @@ type Process struct {
 	LastUpdated          sql.NullTime    `db:"last_updated"`
 	ServerGroupName      sql.NullString  `db:"server_group_name"`
 	SubId                sql.NullInt64   `db:"sub_id"`
-	Deleted              []byte          `db:"deleted"` // TODO temporary, could trip us up, it's a BOOL really
+	Deleted              []byte          `db:"deleted"`
 	TaskId               sql.NullInt64   `db:"task_id"`
 	UniqueId             sql.NullString  `db:"unique_id"`
 	Percent              sql.NullFloat64 `db:"percent"`

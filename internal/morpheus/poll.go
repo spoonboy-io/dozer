@@ -25,7 +25,6 @@ const (
 // checking against the webhook configuration
 func GetProcesses(ctx context.Context, db *sql.DB, st *state.State, logger *koan.Logger) error {
 	rows, err := db.Query("SELECT * FROM process where id > ?;", st.LastPollProcessId)
-	//rows, err := db.Query("SELECT * FROM process where id = 107;") // for testing TODO remove
 	if err != nil {
 		return err
 	}
@@ -95,22 +94,20 @@ func CheckExecuting(ctx context.Context, db *sql.DB, st *state.State, logger *ko
 	return nil
 }
 
-// GetLastProcessIdOnStart
+// GetLastProcessIdOnStart is used to ascertain the latest process id on first run
+// or where no previous state is available
 func GetLastProcessIdOnStart(db *sql.DB, st *state.State) error {
-	// TODO we should(must) get the max id in an SQL query but this is expedient
-	rows, err := db.Query("SELECT * FROM process where id > ?;", st.LastPollProcessId)
+	rows, err := db.Query("SELECT MAX(id) as max_id FROM process;")
 	if err != nil {
 		return err
 	}
 
 	var lastProcessId int
 	for rows.Next() {
-		var process internal.Process
-		err := easyScan(&process, rows)
+		err := rows.Scan(&lastProcessId)
 		if err != nil {
 			return err
 		}
-		lastProcessId = process.Id
 	}
 
 	// update state

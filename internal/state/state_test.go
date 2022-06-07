@@ -69,7 +69,6 @@ func TestReadAndParse(t *testing.T) {
 		// the structs appear identical in content in the output
 		// before we fail let's try inspect the two structs properties
 		// seems to be time, so for now inspect the other two properties
-		// TODO
 
 		if !allowForGithubActions(gotSt, wantSt) {
 			t.Errorf("failed got %v wanted %v", gotSt, wantSt)
