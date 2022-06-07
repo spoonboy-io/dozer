@@ -9,14 +9,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/spoonboy-io/koan"
-
 	"github.com/spoonboy-io/dozer/internal"
 )
 
 func Test_fireWebhook(t *testing.T) {
 	ctx := context.Background()
-	logger := &koan.Logger{}
 	process := &internal.Process{}
 	hook := &Hook{}
 
@@ -27,7 +24,7 @@ func Test_fireWebhook(t *testing.T) {
 	hook.URL = server.URL
 	hook.Description = "test hook"
 
-	if err := fireWebhook(ctx, process, hook, logger); err != nil {
+	if err := fireWebhook(ctx, process, hook); err != nil {
 		t.Errorf("fail %v", err)
 	}
 	server.Close()
@@ -39,7 +36,7 @@ func Test_fireWebhook(t *testing.T) {
 	hook.URL = server2.URL
 	hook.Description = "test hook - bad should be 404 and error"
 
-	if err := fireWebhook(ctx, process, hook, logger); err == nil {
+	if err := fireWebhook(ctx, process, hook); err == nil {
 		t.Errorf("fail expected an error because the server did not return 200")
 	}
 	server2.Close()
@@ -55,7 +52,7 @@ func Test_fireWebhook(t *testing.T) {
 	hook.Description = "test hook - bad should be 404 and error"
 	hook.Token = wantToken
 
-	if err := fireWebhook(ctx, process, hook, logger); err != nil {
+	if err := fireWebhook(ctx, process, hook); err != nil {
 		t.Errorf("fail %v", err)
 	}
 
