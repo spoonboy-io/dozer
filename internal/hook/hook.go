@@ -93,11 +93,8 @@ func ValidateConfig() error {
 		// check url
 		if pURL, err := url.ParseRequestURI(config[i].URL); err != nil {
 			return ERR_BAD_URL
-		} else {
-			// check https
-			if pURL.Scheme != "https" {
-				return ERR_NOT_HTTPS
-			}
+		} else if pURL.Scheme != "https" {
+			return ERR_NOT_HTTPS
 		}
 
 		// if method POST/PUT check request body is present
