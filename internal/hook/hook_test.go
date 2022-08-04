@@ -238,22 +238,27 @@ func TestValidateConfig(t *testing.T) {
 			},
 			wantErr: ERR_BAD_STATUS_TRIGGER,
 		},
-		{
-			name: "url is not HTTPS, should fail",
-			config: Hooks{
-				{
-					Hook{
-						Description: "test hook 1",
-						URL:         "http://testurl.com",
-						Method:      "GET",
-						Triggers: Trigger{
-							Status: "complete",
+
+		// Reference: https://github.com/spoonboy-io/dozer/issues/1
+		// temporary removal of validation
+		/*
+			{
+				name: "url is not HTTPS, should fail",
+				config: Hooks{
+					{
+						Hook{
+							Description: "test hook 1",
+							URL:         "http://testurl.com",
+							Method:      "GET",
+							Triggers: Trigger{
+								Status: "complete",
+							},
 						},
 					},
 				},
+				wantErr: ERR_NOT_HTTPS,
 			},
-			wantErr: ERR_NOT_HTTPS,
-		},
+		*/
 	}
 
 	for _, tc := range testCases {

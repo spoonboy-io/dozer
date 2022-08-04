@@ -91,11 +91,17 @@ func ValidateConfig() error {
 		}
 
 		// check url
-		if pURL, err := url.ParseRequestURI(config[i].URL); err != nil {
+		if _, err := url.ParseRequestURI(config[i].URL); err != nil {
 			return ERR_BAD_URL
-		} else if pURL.Scheme != "https" {
-			return ERR_NOT_HTTPS
 		}
+
+		// Reference: https://github.com/spoonboy-io/dozer/issues/1
+		// temporary removal of validation
+		/*
+			else if pURL.Scheme != "https" {
+				return ERR_NOT_HTTPS
+			}
+		*/
 
 		// if method POST/PUT check request body is present
 		if err := shouldHaveRequestBody(config[i].Method, config[i].RequestBody); err != nil {
