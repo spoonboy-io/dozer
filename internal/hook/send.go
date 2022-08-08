@@ -94,6 +94,7 @@ func fireWebhook(ctx context.Context, process *internal.Process, hook *Hook) err
 		return err
 	}
 	req = req.WithContext(ctx)
+	req.Header.Add("Content-Type", "application/json")
 
 	// form the authorization header if exists
 	if hook.Token != "" {
