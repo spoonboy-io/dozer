@@ -23,6 +23,11 @@ jobs:
         with:
           go-version: 1.18
 
+      - name: Add git safe.directory for container
+        run: |
+          mkdir -p /home/runner/work/_temp/_github_home
+          printf "[safe]\ndirectory = /github/workspace" > /home/runner/work/_temp/_github_home/.gitconfig
+
       - name: Report coverage to DeepSource
         run: |
           # generate the report
