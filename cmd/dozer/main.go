@@ -102,7 +102,16 @@ func main() {
 	// connect to database
 	var db *sql.DB
 	var err error
-	cnString := fmt.Sprintf("%s:%s@tcp(%s:3306)/morpheus?parseTime=true", os.Getenv("MYSQL_USER"), os.Getenv("MYSQL_PASSWORD"), os.Getenv("MYSQL_SERVER"))
+
+	// Fixes https://github.com/spoonboy-io/dozer/issues/2
+	// here we make the database name configurable but need to set 'morpheus' as default, so we don't need a major version change
+	// TODO
+	dbName := "morpheus"
+	if os.Getenv("MYSQL_DATABASE") != "" {
+		dbName = os.Getenv("MYSQL_DATABASE")
+	}
+
+	cnString := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?parseTime=true", os.Getenv("MYSQL_USER"), os.Getenv("MYSQL_PASSWORD"), os.Getenv("MYSQL_SERVER"), dbName)
 	db, err = sql.Open("mysql", cnString)
 	if err != nil {
 		logger.FatalError("Failed to create database connection", err)
