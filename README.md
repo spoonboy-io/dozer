@@ -36,7 +36,7 @@ MYSQL_SERVER=127.0.0.1
 MYSQL_USER=dozer
 MYSQL_PASSWORD=xxxxa8aca0de5dab5fa1bxxxxx
 
-## Optional to override default database poll interval (5 seconds)
+## Optional to override defaults
 MYSQL_DATABASE=morpheus
 POLL_INTERVAL_SECONDS=3
 ```
