@@ -24,7 +24,8 @@ const (
 // if the process is found to be executing it will be tracked, otherwise it is passed on for
 // checking against the webhook configuration
 func GetProcesses(ctx context.Context, db *sql.DB, st *state.State, logger *koan.Logger) error {
-	rows, err := db.Query("SELECT * FROM process where id > ?;", st.LastPollProcessId)
+	//rows, err := db.Query("SELECT * FROM process where id > ?;", st.LastPollProcessId)
+	rows, err := db.Query(easyQuery("> ?"), st.LastPollProcessId)
 	if err != nil {
 		return err
 	}
@@ -71,7 +72,8 @@ func CheckExecuting(ctx context.Context, db *sql.DB, st *state.State, logger *ko
 		strList = append(strList, strconv.Itoa(v))
 	}
 	processList := strings.Join(strList, ",")
-	query := fmt.Sprintf("SELECT * FROM process where id in (%s);", processList)
+	//query := fmt.Sprintf("SELECT * FROM process where id in (%s);", processList)
+	query := fmt.Sprintf(easyQuery("in (%s)"), processList)
 	rows, err := db.Query(query)
 	if err != nil {
 		return err
@@ -182,4 +184,15 @@ func easyScan(process *internal.Process, rows *sql.Rows) error {
 		return err
 	}
 	return nil
+}
+
+// helper so we don't need to build this twice
+func easyQuery(suffix string) string {
+	q := `SELECT id, sub_type, updated_by_id, output_format, date_created, server_name, created_by_id, process_type_id, updated_by, updated_by_display_name,
+error, app_name, success, created_by_display_name, display_name, input, app_id, message, ref_type, job_template_id, container_name, output,
+api_key, account_id, status_eta, timer_sub_category, process_type_name, task_set_name, container_id, job_template_name, task_set_id, last_updated, server_group_name,
+sub_id, deleted, task_id, unique_id, percent, timer_category, reason, end_date, duration, instance_name, start_date, zone_id, input_format, server_id,
+exit_code, integration_id, ref_id, instance_id, server_group_id, task_name, created_by, status, process_result, description, event_title FROM process where id %s;`
+
+	return fmt.Sprintf(q, suffix)
 }
