@@ -50,7 +50,7 @@ func TestGetProcesses(t *testing.T) {
 		AddRow(
 			2, "", 1, "", time.Now(), "", 0, 0, "", "", "", "", false, "", "", "", 0, "", "", 0, "", "", "",
 			0, 0, "", "", "", 0, "", 0, time.Now(), "", 0, "", 0, "", 0, "", "", time.Now(), 0, "", time.Now(), 0, "",
-			0, "", 0, 0, 0, 0, "", "", "executing", "", "", "",
+			0, "", 0, 0, 0, 0, "", "", "running", "", "", "",
 		).
 		AddRow(
 			3, "", 1, "", time.Now(), "", 0, 0, "", "", "", "", false, "", "", "", 0, "", "", 0, "", "", "",
@@ -60,7 +60,7 @@ func TestGetProcesses(t *testing.T) {
 		AddRow(
 			4, "", 1, "", time.Now(), "", 0, 0, "", "", "", "", false, "", "", "", 0, "", "", 0, "", "", "",
 			0, 0, "", "", "", 0, "", 0, time.Now(), "", 0, "", 0, "", 0, "", "", time.Now(), 0, "", time.Now(), 0, "",
-			0, "", 0, 0, 0, 0, "", "", "executing", "", "", "",
+			0, "", 0, 0, 0, 0, "", "", "running", "", "", "",
 		)
 
 	mock.ExpectQuery("^SELECT (.+) FROM process where id > (.+)*").WillReturnRows(rows)
@@ -125,7 +125,7 @@ func TestCheckExecuting(t *testing.T) {
 		AddRow(
 			4, "", 1, "", time.Now(), "", 0, 0, "", "", "", "", false, "", "", "", 0, "", "", 0, "", "", "",
 			0, 0, "", "", "", 0, "", 0, time.Now(), "", 0, "", 0, "", 0, "", "", time.Now(), 0, "", time.Now(), 0, "",
-			0, "", 0, 0, 0, 0, "", "", "executing", "", "", "",
+			0, "", 0, 0, 0, 0, "", "", "running", "", "", "",
 		)
 
 	mock.ExpectQuery("^SELECT (.+) FROM process where id in \\((.+)\\)*").WillReturnRows(rows)

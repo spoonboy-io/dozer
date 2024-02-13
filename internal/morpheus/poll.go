@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	EXECUTING = "executing"
+	EXECUTING = "running"
 )
 
 // GetProcesses polls the database for processes higher than the store latestProcessId
